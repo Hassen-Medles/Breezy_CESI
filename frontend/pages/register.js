@@ -10,13 +10,14 @@ export default function Register() {
     confirmPassword: "",
   });
   const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [showCodeModal, setShowCodeModal] = useState(false);
+  const [code, setCode] = useState("");
+  const [pendingEmail, setPendingEmail] = useState("");
+  const [codeError, setCodeError] = useState("");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
     setError("");
-    setSuccess("");
   };
 
   const handleSubmit = async (e) => {
@@ -36,18 +37,35 @@ export default function Register() {
         }),
       });
       if (res.ok) {
-        setShowModal(true);
-        setTimeout(() => {
-          setShowModal(false);
-          router.push("/accueil");
-        }, 2000);
+        setPendingEmail(form.email);
+        setShowCodeModal(true);
       } else {
         const data = await res.json();
-        setError(data.message || "Erreur lors de la création du compte.");
+        setError(data.message || "Erreur lors de l'envoi du code.");
       }
     } catch (err) {
-      console.error("Erreur dans /register :", err);
       setError("Erreur de connexion au serveur.");
+    }
+  };
+
+  const handleCodeSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/verify", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: pendingEmail, code }),
+      });
+      if (res.ok) {
+        setShowCodeModal(false);
+        setCodeError("");
+        router.push("/accueil");
+      } else {
+        const data = await res.json();
+        setCodeError(data.message || "Code incorrect.");
+      }
+    } catch (err) {
+      setCodeError("Erreur de connexion au serveur.");
     }
   };
 
@@ -98,18 +116,41 @@ export default function Register() {
         <button type="submit">Créer un compte</button>
       </form>
       {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      {showModal && (
+
+      {showCodeModal && (
         <div style={{
           position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
           background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center"
         }}>
-          <div style={{
+          <form onSubmit={handleCodeSubmit} style={{
             background: "white", padding: "2rem", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
           }}>
-            <h2>Compte créé !</h2>
-            <p>Vous allez être redirigé(e) vers l'accueil.</p>
-          </div>
+            <h2>Vérification email</h2>
+            <p>Un code à 6 chiffres a été envoyé à votre adresse mail.</p>
+            <input
+              type="text"
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              placeholder="Code à 6 chiffres"
+              required
+            />
+            {codeError && <p style={{ color: "red" }}>{codeError}</p>}
+            <div style={{ marginTop: "1rem" }}>
+              <button type="submit">Valider</button>
+              <button
+                type="button"
+                style={{ marginLeft: "1rem" }}
+                onClick={() => {
+                  setShowCodeModal(false);
+                  setCode("");
+                  setCodeError("");
+                  router.push("/accueil");
+                }}
+              >
+                Plus tard
+              </button>
+            </div>
+          </form>
         </div>
       )}
     </div>
