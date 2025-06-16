@@ -20,8 +20,8 @@ services:
     environment:
       - MONGO_URI=mongodb://mongo:27017/breezy_auth
       - AUTH_TOKEN=supersecretkey
-      - EMAIL_USER=ton.email@gmail.com
-      - EMAIL_PASS=ton_mot_de_passe_ou_app_password
+      - EMAIL_USER=zoe.izambert@gmail.com
+      - EMAIL_PASS=mywyknioxtiotlyu
       - NODE_ENV=development
     depends_on:
       - mongo

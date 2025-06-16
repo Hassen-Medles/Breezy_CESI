@@ -18,6 +18,7 @@ function authenticateToken(req, res, next) {
 export default function(app) {
     app.post("/login", authController.login);
     app.post("/register", authController.register);
+    app.post("/verify", authController.verify);
 
     // Route protégée par le middleware
     app.get("/authenticate", authenticateToken, (req, res) => {
