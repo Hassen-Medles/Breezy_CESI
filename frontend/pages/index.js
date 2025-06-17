@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import { FooterSimple } from "../components/Footers";
 
 export default function Login() {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -33,33 +34,33 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <main className="flex-1 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
+      <main className="flex-1 flex flex-col items-center justify-center">
         <form
-          className="bg-white shadow rounded p-6 w-full max-w-xs"
+          className="bg-white rounded-lg shadow-md p-6 w-full max-w-xs flex flex-col gap-4"
           onSubmit={handleSubmit}
         >
           <div className="mb-5">
-            <label htmlFor="username" className="block text-black font-mono text-sm mb-1">
+            <label htmlFor="username" className="block mb-1 font-mono text-lg">
               Identifiant
             </label>
             <input
               id="username"
               type="text"
-              className="w-full border rounded px-3 py-2 text-gray-700 text-sm focus:outline-none"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#12F146]"
               value={form.username}
               onChange={handleChange}
               required
             />
           </div>
           <div className="mb-6">
-            <label htmlFor="password" className="block text-black font-mono text-sm mb-1">
+            <label htmlFor="password" className="block mb-1 font-mono text-lg">
               Mot de passe
             </label>
             <input
               id="password"
               type="password"
-              className="w-full border rounded px-3 py-2 text-gray-700 text-sm focus:outline-none"
+              className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[#12F146]"
               value={form.password}
               onChange={handleChange}
               required
@@ -67,7 +68,7 @@ export default function Login() {
           </div>
           <button
             type="submit"
-            className="w-full bg-green-500 hover:bg-green-600 text-white text-sm font-bold py-2 rounded"
+            className="w-full bg-[#4CC3FF] hover:bg-[#38aeea] text-white text-lg font-semibold py-3 rounded-lg transition"
           >
             Se connecter
           </button>
@@ -82,7 +83,7 @@ export default function Login() {
           </p>
         </div>
       </main>
-      <footer className="border-t p-2 text-center text-xs text-gray-400"></footer>
+      <FooterSimple />
     </div>
   );
 }
