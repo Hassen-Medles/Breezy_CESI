@@ -2,6 +2,7 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Navbar from "../components/Navbar";
 
 export default function LoginForm() {
   const [form, setForm] = useState({ username: "", password: "" });
@@ -33,11 +34,13 @@ export default function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
-      >
+    <>
+      <Navbar title="CONNEXION" />
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
+        >
         <div>
           <label htmlFor="username" className="block text-sm font-medium mb-2">
             Identifiant
@@ -84,6 +87,7 @@ export default function LoginForm() {
       </div>
     </form>
   </div>
+  </>
 );
 
 }

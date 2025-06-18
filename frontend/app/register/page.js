@@ -1,9 +1,10 @@
 import RegisterForm from "../../components/RegisterForm";
+import Navbar from "../../components/Navbar";
 
 export default function RegisterPage() {
   return (
     <main>
-      <h2>Créer un compte</h2>
+      <Navbar title="INSCRIPTION" />
       <RegisterForm />
     </main>
   );
