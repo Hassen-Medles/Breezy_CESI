@@ -19,24 +19,6 @@ mongoose.connect(process.env.MONGO_URI, {});
 // Monte les routes d'authentification APRÈS la config d'app
 authRoutes(app);
 
-// Vérification du code
-app.post("/verify", async (req, res) => {
-  const { email, code } = req.body;
-  try {
-    const user = await User.findOne({ email, verificationCode: code });
-    if (!user) {
-      return res.status(400).json({ message: "Code invalide." });
-    }
-    user.isVerified = true;
-    user.verificationCode = undefined;
-    await user.save();
-    res.json({ message: "Compte vérifié !" });
-  } catch (err) {
-    console.error("Erreur dans /verify :", err);
-    res.status(500).json({ message: "Erreur serveur." });
-  }
-});
-
 app.listen(5000, () => {
   console.log("Auth-service running on http://localhost:5000");
 });

@@ -1,15 +1,44 @@
-import Link from "next/link";
+import Image from "next/image";
+import { Archivo_Black } from "next/font/google";
+
+const archivoBlack = Archivo_Black({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-archivo-black",
+});
 
 export default function Navbar() {
   return (
-    <div className="flex items-center space-x-2">
-        <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-        <path d="M4 8h16M4 16h24M4 24h16" stroke="#00C2A8" strokeWidth="3" strokeLinecap="round" />
-        </svg>
-        <span className="text-xl font-bold">
-        <span className="text-blue-600">CON</span>
-        <span className="text-green-500">NEXION</span>
-        </span>
-    </div>
+    <header>
+      <div className="max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20">
+      <div
+        className="w-10 h-10"
+        style={{
+          WebkitMaskImage: "url(/wind-solid.svg)",
+          maskImage: "url(/wind-solid.svg)",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          background: "linear-gradient(90deg, #00AEEF 25%, #12F146 69%)",
+          backgroundClip: "border-box",
+          display: "inline-block",
+        }}
+      />
+
+        {/* Texte multicolore */}
+      <h1 className="text-2xl font-extrabold flex">
+<span
+  className={`${archivoBlack.variable} font-archivo-black bg-clip-text text-transparent text-3xl`}
+  style={{
+    background: "linear-gradient(90deg, #00AEEF 25%, #12F146 69%)",
+    WebkitBackgroundClip: "text", // <-- Ajoute cette ligne !
+  }}
+>
+  CONNEXION
+</span>
+      </h1>
+      </div>
+    </header>
   );
 }

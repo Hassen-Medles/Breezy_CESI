@@ -1,7 +1,8 @@
+"use client";
 import { useState } from "react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
-export default function Register() {
+export default function RegisterForm() {
   const router = useRouter();
   const [form, setForm] = useState({
     username: "",
