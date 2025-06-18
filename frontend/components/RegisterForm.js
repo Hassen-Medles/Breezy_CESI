@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Navbar from "../components/Navbar";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -71,89 +72,125 @@ export default function RegisterForm() {
   };
 
   return (
-    <div>
-      <h2>Créer un compte</h2>
-      <form onSubmit={handleSubmit}>
+    <>
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+
+      <form
+        onSubmit={handleSubmit}
+        className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
+      >
         <div>
-          <label>Nom d'utilisateur :</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="username">
+            Identifiant
+          </label>
           <input
             type="text"
+            id="username"
             name="username"
             value={form.username}
             onChange={handleChange}
             required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+            autoComplete="username"
           />
         </div>
         <div>
-          <label>Email :</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="email">
+            Email
+          </label>
           <input
             type="email"
+            id="email"
             name="email"
             value={form.email}
             onChange={handleChange}
             required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+            autoComplete="email"
           />
         </div>
         <div>
-          <label>Mot de passe :</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="password">
+            Mot de passe
+          </label>
           <input
             type="password"
+            id="password"
             name="password"
             value={form.password}
             onChange={handleChange}
             required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+            autoComplete="new-password"
           />
         </div>
         <div>
-          <label>Confirmer le mot de passe :</label>
+          <label className="block text-sm font-medium mb-2" htmlFor="confirmPassword">
+            Confirmer le mot de passe
+          </label>
           <input
             type="password"
+            id="confirmPassword"
             name="confirmPassword"
             value={form.confirmPassword}
             onChange={handleChange}
             required
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+            autoComplete="new-password"
           />
         </div>
-        <button type="submit">Créer un compte</button>
+        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+        <button
+          type="submit"
+          className="w-full bg-sky-500 text-white font-semibold py-2 rounded-lg hover:bg-sky-600 transition duration-200"
+        >
+          Créer un compte
+        </button>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
 
+      {/* MODALE de vérification du code */}
       {showCodeModal && (
-        <div style={{
-          position: "fixed", top: 0, left: 0, width: "100vw", height: "100vh",
-          background: "rgba(0,0,0,0.3)", display: "flex", alignItems: "center", justifyContent: "center"
-        }}>
-          <form onSubmit={handleCodeSubmit} style={{
-            background: "white", padding: "2rem", borderRadius: "8px", boxShadow: "0 2px 8px rgba(0,0,0,0.2)"
-          }}>
-            <h2>Vérification email</h2>
-            <p>Un code à 6 chiffres a été envoyé à votre adresse mail.</p>
-            <input
-              type="text"
-              value={code}
-              onChange={e => setCode(e.target.value)}
-              placeholder="Code à 6 chiffres"
-              required
-            />
-            {codeError && <p style={{ color: "red" }}>{codeError}</p>}
-            <div style={{ marginTop: "1rem" }}>
-              <button type="submit">Valider</button>
-              <button
-                type="button"
-                style={{ marginLeft: "1rem" }}
-                onClick={() => {
-                  setShowCodeModal(false);
-                  setCode("");
-                  setCodeError("");
-                  router.push("/accueil");
-                }}
-              >
-                Plus tard
-              </button>
-            </div>
-          </form>
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md space-y-4">
+            <h2 className="text-2xl font-bold text-gray-800 text-center">Vérification email</h2>
+            <p className="text-gray-600 text-sm text-center">
+              Un code à 6 chiffres a été envoyé à votre adresse mail.
+            </p>
+            <form onSubmit={handleCodeSubmit} className="space-y-4">
+              <input
+                type="text"
+                value={code}
+                onChange={(e) => setCode(e.target.value)}
+                placeholder="Code à 6 chiffres"
+                required
+                className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+              />
+              {codeError && <p className="text-red-500 text-sm">{codeError}</p>}
+              <div className="flex justify-between">
+                <button
+                  type="submit"
+                  className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300"
+                >
+                  Valider
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCodeModal(false);
+                    setCode("");
+                    setCodeError("");
+                    router.push("/accueil");
+                  }}
+                  className="w-full ml-4 py-2 px-4 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300"
+                >
+                  Plus tard
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>
+    </>
   );
 }

@@ -1,25 +1,25 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { FaHome, FaSearch, FaBell, FaUser } from "react-icons/fa";
 
 export function Footer() {
   const [active, setActive] = useState(null);
 
   return (
-    <footer className=" bottom-0 left-0 w-screen bg-white border-t border-gray-200 flex justify-around items-center py-2 z-[100]">
-      {[FaHome, FaSearch, FaBell, FaUser].map((Icon, idx) => (
-        <button
-          key={idx}
-          onClick={() => setActive(idx)}
-          className={`bg-none border-none cursor-pointer text-2xl p-2 flex-1 transition-colors duration-200 touch-manipulation ${
-            active === idx ? "text-cyan-500" : "text-gray-900"
-          }`}
-          aria-label={`icon-${idx}`}
-          type="button"
-        >
-          <Icon />
-        </button>
-      ))}
+    <footer className="fixed bottom-0 left-0 w-full bg-white flex justify-around py-4 z-50">
+      <Link href="/accueil" className="group">
+        <FaHome className="w-8 h-8 text-gray-900 group-hover:text-sky-500 group-active:text-sky-500 transition" />
+      </Link>
+      <Link href="/recherche" className="group">
+        <FaSearch className="w-8 h-8 text-gray-900 group-hover:text-sky-500 group-active:text-sky-500 transition" />
+      </Link>
+      <Link href="/notification" className="group">
+        <FaBell className="w-8 h-8 text-gray-900 group-hover:text-sky-500 group-active:text-sky-500 transition" />
+      </Link>
+      <Link href="/profil" className="group">
+        <FaUser className="w-8 h-8 text-gray-900 group-hover:text-sky-500 group-active:text-sky-500 transition" />
+      </Link>
     </footer>
   );
 }

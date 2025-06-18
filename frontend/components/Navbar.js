@@ -7,12 +7,12 @@ const archivoBlack = Archivo_Black({
   variable: "--font-archivo-black",
 });
 
-export default function Navbar() {
+export default function Navbar({ title }) {
   return (
     <header>
-      <div className="max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20">
-      <div
-        className="w-10 h-10"
+      <nav className="max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20">
+      <div 
+        className=" w-12 h-12 absolute left-8"
         style={{
           WebkitMaskImage: "url(/wind-solid.svg)",
           maskImage: "url(/wind-solid.svg)",
@@ -32,13 +32,13 @@ export default function Navbar() {
   className={`${archivoBlack.variable} font-archivo-black bg-clip-text text-transparent text-3xl`}
   style={{
     background: "linear-gradient(90deg, #00AEEF 25%, #12F146 69%)",
-    WebkitBackgroundClip: "text", // <-- Ajoute cette ligne !
+    WebkitBackgroundClip: "text",
   }}
 >
-  CONNEXION
+  {title}
 </span>
       </h1>
-      </div>
+      </nav>
     </header>
   );
 }
