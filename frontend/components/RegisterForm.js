@@ -24,6 +24,17 @@ export default function RegisterForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const password = form.password;
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+
+    if (password.length < 8) {
+      setError("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+    if (!specialCharRegex.test(password)) {
+      setError("Le mot de passe doit contenir au moins un caractère spécial.");
+      return;
+    }
     if (form.password !== form.confirmPassword) {
       setError("Les mots de passe ne correspondent pas.");
       return;
