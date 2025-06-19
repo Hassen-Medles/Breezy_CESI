@@ -19,18 +19,33 @@ const transporter = nodemailer.createTransport({
 });
 
 export const register = async (req, res) => {
-  console.log("Requête reçue sur /register :", req.body);
   try {
-    const { username, email, password } = req.body;
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    const { email, password } = req.body;
+    const profilePicture = req.file ? req.file.filename : null;
+
+    const existingUser = await User.findOne({ email });
     if (existingUser) {
-      return res.status(400).json({ message: "Email ou username déjà existant" });
+      return res.status(400).json({ message: "Email déjà existant" });
     }
     const hashedPassword = await bcrypt.hash(password, 10);
     const verificationCode = generateVerificationCode();
 
+    // Crée l'utilisateur d'abord
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      verificationCode,
+      isVerified: false,
+      // description et profilePicture peuvent être undefined ici
+      description: undefined,
+      profilePicture,
+    });
+
+    await newUser.save();
+
+    // Génère le token avec newUser
     const token = jwt.sign(
-      { username, email },
+      { id: newUser._id, email: newUser.email },
       process.env.AUTH_TOKEN,
       { expiresIn: "1h" }
     );
@@ -43,16 +58,6 @@ export const register = async (req, res) => {
       html: `<p>Votre code de vérification est : <b>${verificationCode}</b></p>`
     });
 
-    const newUser = new User({
-      username,
-      email,
-      password: hashedPassword,
-      jwt: token,
-      verificationCode,
-      isVerified: false,
-    });
-
-    await newUser.save();
     return res.status(201).json({ message: "New User created! Vérifiez votre email.", token });
   } catch (err) {
     console.error("Erreur dans /register :", err);
@@ -67,9 +72,15 @@ export const verify = async (req, res) => {
     return res.status(400).json({ message: "Code incorrect ou expiré." });
   }
   user.isVerified = true;
-  user.verificationCode = undefined; // Optionnel : supprime le code après vérification
+  user.verificationCode = undefined;
   await user.save();
-  res.status(201).json({ message: "Compte vérifié !" });
+
+  const token = jwt.sign(
+    { id: user._id, email: user.email },
+    process.env.AUTH_TOKEN,
+    { expiresIn: "1h" }
+  );
+  res.status(201).json({ message: "Compte vérifié !", token });
 };
 
 export const login = async (req, res) => {
@@ -92,10 +103,6 @@ export const login = async (req, res) => {
       process.env.AUTH_TOKEN,
       { expiresIn: "1h" }
     );
-
-    // Enregistre le JWT dans le user
-    user.jwt = token;
-    await user.save();
 
     res.json({ message: "Connexion réussie !", token });
   } catch (err) {
@@ -126,3 +133,37 @@ export const authenticate = async (req, res, next) => {
     //return res.status(200).json({ message: "Authenticated", user: user });
   });
 }
+
+export const completeProfile = async (req, res) => {
+  try {
+    const { username, description } = req.body;
+    const profilePicture = req.file ? req.file.filename : null;
+    const userId = req.user.id;
+
+    if (!username) {
+      return res.status(400).json({ message: "Le nom d'utilisateur est obligatoire." });
+    }
+
+    const existing = await User.findOne({ username });
+    if (existing && existing._id.toString() !== userId) {
+      return res.status(400).json({ message: "Ce nom d'utilisateur est déjà pris." });
+    }
+
+    const updateFields = { username, description };
+    if (profilePicture) updateFields.profilePicture = profilePicture;
+
+    const user = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+
+    // Envoi du mail de bienvenue après complétion du profil
+    await transporter.sendMail({
+      from: `"Breezy" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Bienvenue sur Breezy !",
+      html: `<p>Votre compte est maintenant complet. Bienvenue !</p>`,
+    });
+
+    res.json({ message: "Profil mis à jour !" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la complétion du profil." });
+  }
+};
