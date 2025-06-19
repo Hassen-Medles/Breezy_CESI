@@ -133,3 +133,37 @@ export const authenticate = async (req, res, next) => {
     //return res.status(200).json({ message: "Authenticated", user: user });
   });
 }
+
+export const completeProfile = async (req, res) => {
+  try {
+    const { username, description } = req.body;
+    const profilePicture = req.file ? req.file.filename : null;
+    const userId = req.user.id;
+
+    if (!username) {
+      return res.status(400).json({ message: "Le nom d'utilisateur est obligatoire." });
+    }
+
+    const existing = await User.findOne({ username });
+    if (existing && existing._id.toString() !== userId) {
+      return res.status(400).json({ message: "Ce nom d'utilisateur est déjà pris." });
+    }
+
+    const updateFields = { username, description };
+    if (profilePicture) updateFields.profilePicture = profilePicture;
+
+    const user = await User.findByIdAndUpdate(userId, updateFields, { new: true });
+
+    // Envoi du mail de bienvenue après complétion du profil
+    await transporter.sendMail({
+      from: `"Breezy" <${process.env.EMAIL_USER}>`,
+      to: user.email,
+      subject: "Bienvenue sur Breezy !",
+      html: `<p>Votre compte est maintenant complet. Bienvenue !</p>`,
+    });
+
+    res.json({ message: "Profil mis à jour !" });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la complétion du profil." });
+  }
+};
