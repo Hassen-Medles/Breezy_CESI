@@ -27,7 +27,7 @@ export function Footer() {
 export function FooterSimple() {
   return (
     <footer className="w-screen text-center py-4 bg-white z-[100]">
-      © 2025 Breezy CESI
+      © 2025 Breezy - Tous droits réservés.
     </footer>
   );
 }

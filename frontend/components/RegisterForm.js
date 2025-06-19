@@ -6,7 +6,6 @@ import Navbar from "../components/Navbar";
 export default function RegisterForm() {
   const router = useRouter();
   const [form, setForm] = useState({
-    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -25,14 +24,14 @@ export default function RegisterForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const password = form.password;
-    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/;
+    const specialCharRegex = /[/!@#$%^&*(),.?":{}|<>]/;
 
     if (password.length < 8) {
       setError("Le mot de passe doit contenir au moins 8 caractères.");
       return;
     }
     if (!specialCharRegex.test(password)) {
-      setError("Le mot de passe doit contenir au moins un caractère spécial.");
+      setError("Le mot de passe doit contenir au moins un caractère spécial. Ex: /!@#$%^&*(),.?\":{}|<>");
       return;
     }
     if (form.password !== form.confirmPassword) {
@@ -44,7 +43,6 @@ export default function RegisterForm() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: form.username,
           email: form.email,
           password: form.password,
         }),
@@ -72,7 +70,11 @@ export default function RegisterForm() {
       if (res.ok) {
         setShowCodeModal(false);
         setCodeError("");
-        router.push("/accueil");
+        const data = await res.json();
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+          router.push("/registerprofil");
+        }
       } else {
         const data = await res.json();
         setCodeError(data.message || "Code incorrect.");
@@ -90,21 +92,6 @@ export default function RegisterForm() {
         onSubmit={handleSubmit}
         className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
       >
-        <div>
-          <label className="block text-sm font-medium mb-2" htmlFor="username">
-            Identifiant
-          </label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={form.username}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
-            autoComplete="username"
-          />
-        </div>
         <div>
           <label className="block text-sm font-medium mb-2" htmlFor="email">
             Email
@@ -153,17 +140,16 @@ export default function RegisterForm() {
         {error && <div className="text-red-500 text-sm text-center">{error}</div>}
         <button
           type="submit"
-          className="w-full bg-sky-500 text-white font-semibold py-2 rounded-lg hover:bg-sky-600 transition duration-200"
+          className="w-full bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:brightness-110 transition"
         >
           Créer un compte
         </button>
       </form>
 
-      {/* MODALE de vérification du code */}
       {showCodeModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md space-y-4">
-            <h2 className="text-2xl font-bold text-gray-800 text-center">Vérification email</h2>
+            <h2 className="text-2xl font-bold text-gray-800 text-center">Vérification de l'email</h2>
             <p className="text-gray-600 text-sm text-center">
               Un code à 6 chiffres a été envoyé à votre adresse mail.
             </p>
@@ -180,7 +166,7 @@ export default function RegisterForm() {
               <div className="flex justify-between">
                 <button
                   type="submit"
-                  className="w-full py-2 px-4 bg-blue-500 text-white font-semibold rounded-md hover:bg-blue-600 transition duration-300"
+                  className="w-full bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:brightness-110 transition"
                 >
                   Valider
                 </button>
@@ -190,7 +176,7 @@ export default function RegisterForm() {
                     setShowCodeModal(false);
                     setCode("");
                     setCodeError("");
-                    router.push("/accueil");
+                    router.push("/registerprofil");
                   }}
                   className="w-full ml-4 py-2 px-4 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300"
                 >
