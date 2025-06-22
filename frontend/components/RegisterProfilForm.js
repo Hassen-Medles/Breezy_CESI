@@ -69,18 +69,20 @@ export default function RegisterProfilForm() {
         <form className="space-y-4" onSubmit={handleSubmit}>
           <div className="flex flex-col items-center mb-2">
             <div
-              className="w-28 h-28 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300 cursor-pointer hover:ring-2 hover:ring-sky-400 transition"
+              className="w-28 h-28 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-300 p-1 cursor-pointer hover:ring-2 hover:ring-sky-400 transition"
               onClick={openFileDialog}
             >
-              {preview ? (
-                <img
-                  src={preview}
-                  alt="Photo de profil"
-                  className="w-28 h-28 rounded-full object-cover"
-                />
-              ) : (
-                <FaUserCircle size={64} className="text-gray-400" />
-              )}
+              <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
+                {preview ? (
+                  <img
+                    src={preview}
+                    alt="Photo de profil"
+                    className="w-24 h-24 rounded-full object-cover"
+                  />
+                ) : (
+                  <FaUserCircle size={64} className="text-sky-300" />
+                )}
+              </div>
             </div>
             <span
               className="mt-2 text-sky-600 font-medium cursor-pointer hover:underline"
@@ -119,12 +121,12 @@ export default function RegisterProfilForm() {
               name="description"
               value={form.description}
               onChange={handleChange}
-              maxLength={256}
+              maxLength={180}
               rows={3}
               className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-sky-300"
             />
             <p className="text-xs text-right text-gray-500">
-              {form.description.length}/256
+              {form.description.length}/180
             </p>
           </div>
 
