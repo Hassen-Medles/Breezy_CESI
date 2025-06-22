@@ -10,6 +10,7 @@ router.post('/posts', auth, postController.createPost);
 
 
 //router.get('/posts/user/:userId', auth, postController.getPostsbyUser);
+router.get('/posts/user/me', auth, postController.getMyPosts);
 
 router.get('/posts/:postId', postController.getPostById);
 //router.get('/posts/:postId', auth, postController.getPostById);
