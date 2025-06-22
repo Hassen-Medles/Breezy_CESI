@@ -8,7 +8,7 @@ exports.createPost = async (req, res) => {
     }
     const post = new Post({
       content,
-      //author: req.user.id // <-- à décommenter quand l'auth sera en place
+      author: req.user.userId || req.user.id
     });
     await post.save();
     res.status(201).json(post);
@@ -16,7 +16,6 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la publication.' });
   }
 };
-8
 
 exports.getAllPosts = async (req, res) => {
   try {

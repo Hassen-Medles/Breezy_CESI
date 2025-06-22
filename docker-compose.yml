@@ -9,6 +9,7 @@ services:
     depends_on:
       - frontend
       - auth-service
+      - api
       
   mongo:
     image: mongo:7
@@ -44,6 +45,18 @@ services:
     command: npm run dev
     depends_on:
       - auth-service
+  api:
+    build:
+      context: ./backend/api
+    container_name: api
+    ports:
+      - "5001:5001"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/breezy_auth
+      - JWT_SECRET=supersecretkey
+      - PORT=5001
+    depends_on:
+      - mongo
 
 volumes:
   mongo_data:
