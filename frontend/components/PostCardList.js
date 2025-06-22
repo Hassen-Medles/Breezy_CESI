@@ -66,7 +66,7 @@ export default function PostCardList() {
       {loading ? (
         <div>Chargement...</div>
       ) : posts.length === 0 ? (
-        <div className="text-gray-400">Aucun message trouvé.<br/>Debug: {JSON.stringify(posts)}</div>
+        <div className="text-gray-400">Aucun message trouvé.<br/></div>
       ) : (
         <>
           {postsToShow.map((post) => (
