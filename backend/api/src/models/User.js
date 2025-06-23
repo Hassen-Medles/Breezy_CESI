@@ -1,46 +1,14 @@
 const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
-    username: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-    },
-    email: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        lowercase: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    bio: {
-        type: String,
-        trim: true,
-    },
-    profilePicture: {
-        type: String,
-        default: '../../defaultimage.png',
-    },
-    createdAt: {
-        type: Date,
-        default: Date.now,
-    },
-    deleted: {
-        type: Boolean,
-        default: false,
-    },
-    role: {
-        type: String,
-        enum: ['user', 'admin','moderator'],
-        default: 'user',
-        required: true,
-    },
-}, { timestamps: true });
+  username: { type: String, required: false, unique: true },
+  email:    { type: String, required: true, unique: true },
+  password: { type: String, required: true },
+  verificationCode: { type: String },      // Code à 6 chiffres envoyé par email
+  isVerified: { type: Boolean, default: false }, // Statut de vérification
+  description: { type: String },
+  profilePicture: { type: String }
+});
+
 const User = mongoose.model('User', userSchema);
 module.exports = User;
