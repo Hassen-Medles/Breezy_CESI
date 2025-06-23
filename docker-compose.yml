@@ -1,3 +1,4 @@
+version: '3.8'
 services:
   nginx:
     image: nginx:latest
@@ -10,7 +11,7 @@ services:
       - frontend
       - auth-service
       - api
-      
+
   mongo:
     image: mongo:7
     container_name: mongo-breezy
@@ -45,6 +46,7 @@ services:
     command: npm run dev
     depends_on:
       - auth-service
+
   api:
     build:
       context: ./backend/api

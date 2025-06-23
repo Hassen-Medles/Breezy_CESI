@@ -39,13 +39,14 @@ export default function RegisterForm() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/register", {
+      const res = await fetch("/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.email,
           password: form.password,
         }),
+        credentials: "include"
       });
       if (res.ok) {
         setPendingEmail(form.email);
@@ -62,19 +63,16 @@ export default function RegisterForm() {
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await fetch("http://localhost:5000/verify", {
+      const res = await fetch("/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: pendingEmail, code }),
+        credentials: "include"
       });
       if (res.ok) {
         setShowCodeModal(false);
         setCodeError("");
-        const data = await res.json();
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          router.push("/registerprofil");
-        }
+        router.push("/registerprofil");
       } else {
         const data = await res.json();
         setCodeError(data.message || "Code incorrect.");

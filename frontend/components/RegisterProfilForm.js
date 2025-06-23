@@ -39,14 +39,11 @@ export default function RegisterProfilForm() {
         }
 
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/profile", {
-            method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-            body: formData,
-            });
+            const res = await fetch("/auth/profile", {
+        method: "POST",
+        body: formData,
+        credentials: "include"
+      });
 
             const data = await res.json();
 
