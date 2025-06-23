@@ -124,27 +124,22 @@ export const login = async (req, res) => {
 };
 
 export const authenticate = async (req, res, next) => {
-  let token = req.headers["authorization"];
-  if (!token || !token.startsWith("Bearer ")) {
+  const token = req.cookies.token;
+  if (!token) {
     return res.status(401).json({ message: "No token provided" });
   }
-  let TOKEN = token.split(" ")[1];
-
-  jwt.verify(TOKEN, process.env.AUTH_TOKEN, async (err, decoded) => {
+  jwt.verify(token, process.env.AUTH_TOKEN, async (err, decoded) => {
     if (err) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-
-    // Vérifie que l'utilisateur existe toujours
-    const user = await User.findOne({ email: decoded.email });
+    const user = await User.findById(decoded.id || decoded.userId);
     if (!user) {
       return res.status(404).json({ message: "User not found" });
     }
-    req.user = user; // Optionnel : attache l'utilisateur à la requête
+    req.user = user;
     next();
-    //return res.status(200).json({ message: "Authenticated", user: user });
   });
-}
+};
 
 export const completeProfile = async (req, res) => {
   try {

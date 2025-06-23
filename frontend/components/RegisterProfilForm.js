@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 
@@ -12,7 +12,17 @@ export default function RegisterProfilForm() {
         description: "",
         profilePicture: null,
     });
-
+    useEffect(() => {
+      // Vérifie si l'utilisateur est authentifié avant d'afficher le formulaire
+      fetch("http://localhost:8080/auth/profile", {
+        method: "GET",
+        credentials: "include"
+      }).then(res => {
+        if (res.status === 401) {
+          router.push("/login");
+        }
+      });
+    }, []);
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState("");
 

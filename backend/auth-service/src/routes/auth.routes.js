@@ -1,4 +1,5 @@
 import * as authController from "../controllers/auth.controller.js";
+import { authenticate, completeProfile } from "../controllers/auth.controller.js";
 import jwt from "jsonwebtoken";
 import multer from "multer";
 import User from "../models/user.model.js";
@@ -27,5 +28,8 @@ export default function(app) {
     // Route protégée par le middleware
     app.get("/authenticate", authenticateToken, (req, res) => {
         return res.status(200).json({ message: "Authenticated" });
+    });
+    app.get("/auth/profile", authenticateToken, (req, res) => {
+        res.status(200).json({ ok: true });
     });
 }
