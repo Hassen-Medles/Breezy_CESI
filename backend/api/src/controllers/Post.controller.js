@@ -9,7 +9,7 @@ exports.createPost = async (req, res) => {
     }
     const post = new Post({
       content,
-      //author: req.user.id // <-- à décommenter quand l'auth sera en place
+      author: req.user.userId || req.user.id
     });
     await post.save();
     res.status(201).json(post);
@@ -17,7 +17,6 @@ exports.createPost = async (req, res) => {
     res.status(500).json({ message: 'Erreur lors de la publication.' });
   }
 };
-8
 
 exports.getAllPosts = async (req, res) => {
   try {
@@ -86,20 +85,15 @@ exports.deletePost = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression du post.' });
   }
-<<<<<<< Updated upstream
-=======
 };
 
 // Récupérer les posts de l'utilisateur connecté via le JWT
 exports.getMyPosts = async (req, res) => {
   try {
     const userId = req.user.userId || req.user.id;
-    const posts = await Post.find({ author: userId })
-      .populate('author', 'username profilePicture')
-      .sort({ createdAt: -1 });
+    const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la récupération des posts de l'utilisateur connecté." });
   }
->>>>>>> Stashed changes
 };

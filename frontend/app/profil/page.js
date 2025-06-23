@@ -1,5 +1,3 @@
-<<<<<<< Updated upstream
-=======
 import {
   FaUserCircle,
   FaBookmark,
@@ -7,17 +5,14 @@ import {
   FaEllipsisH,
 } from "react-icons/fa";
 import { FiPlus } from "react-icons/fi";
->>>>>>> Stashed changes
 import Navbar from "../../components/Navbar";
+import { Footer } from "../../components/FooterSwitcher/Footers";
+import PostCardList from "../../components/PostCardList";
 
-export default function Profil() {
+export default function ProfilPage() {
   return (
-    <>
+    <div className="min-h-screen bg-gray-50 pb-24">
       <Navbar title="PROFIL" />
-<<<<<<< Updated upstream
-      <h1>Page Profil</h1>
-    </>
-=======
       <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10 mt-5">
         <div className="flex flex-col md:flex-row items-start md:gap-0 gap-6">
           <div className="flex-1 flex flex-col items-center md:items-start">
@@ -25,7 +20,7 @@ export default function Profil() {
             <div className="flex-shrink-0 flex justify-center md:justify-start w-full md:w-auto md:ml-16">
               <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-400 p-1 shadow">
                 <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
-                    <FaUserCircle size={110} className="text-sky-300" />
+                  <FaUserCircle size={110} className="text-sky-300" />
                 </div>
               </div>
             </div>
@@ -63,9 +58,8 @@ export default function Profil() {
         <div className="mt-4">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-semibold text-lg text-gray-800 mt-2 mb-2">Vos messages</span>
-            {/* <span className="text-gray-300 text-base mt-2 mb-2">24 publications</span> */}
           </div>
-          <div className="bg-gray-100 rounded-2xl p-6 shadow-inner">x
+          <div className="bg-gray-100 rounded-2xl p-6 shadow-inner">
             <PostCardList />
           </div>
         </div>
@@ -83,6 +77,5 @@ export default function Profil() {
       </div>
       <Footer />
     </div>
->>>>>>> Stashed changes
   );
 }
