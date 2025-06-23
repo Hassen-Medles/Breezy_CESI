@@ -58,7 +58,7 @@ export const register = async (req, res) => {
       html: `<p>Votre code de vérification est : <b>${verificationCode}</b></p>`
     });
 
-    return res.status(201).json({ message: "New User created! Vérifiez votre email.", token });
+    return res.status(201).json({ message: "New User created! Vérifiez votre email."});
   } catch (err) {
     console.error("Erreur dans /register :", err);
     res.status(500).json({ message: "Erreur serveur." });
@@ -80,7 +80,13 @@ export const verify = async (req, res) => {
     process.env.AUTH_TOKEN,
     { expiresIn: "1h" }
   );
-  res.status(201).json({ message: "Compte vérifié !", token });
+  res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  });
+  res.status(201).json({ message: "Compte vérifié !" });
 };
 
 export const login = async (req, res) => {
@@ -104,7 +110,13 @@ export const login = async (req, res) => {
       { expiresIn: "1h" }
     );
 
-    res.json({ message: "Connexion réussie !", token });
+    res.cookie('token', token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 24 * 60 * 60 * 1000
+  });
+  res.json({ message: "Connexion réussie !" });
   } catch (err) {
     console.error("Erreur dans /login :", err);
     res.status(500).json({ message: "Erreur serveur." });
