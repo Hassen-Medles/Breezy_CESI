@@ -1,3 +1,4 @@
+"use client";
 import {
   FaUserCircle,
   FaBookmark,
@@ -25,10 +26,10 @@ export default function ProfilPage() {
               </div>
             </div>
             <div className="flex gap-6 justify-center md:justify-start mt-12">
-              <button className="bg-gradient-to-r from-sky-500 to-indigo-500 text-white py-2 px-7 rounded-xl font-semibold hover:brightness-110 transition">
-                Modifier
-              </button>
-              <button className="bg-gray-200 text-gray-600 py-2 px-7 rounded-xl font-semibold hover:bg-gray-300">
+              <button
+                className="bg-gray-200 text-gray-600 py-2 px-7 rounded-xl font-semibold hover:bg-gray-300"
+                onClick={() => window.location.href = '/parametres'}
+              >
                 Paramètre
               </button>
             </div>
