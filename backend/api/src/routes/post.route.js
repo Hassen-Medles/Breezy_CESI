@@ -6,8 +6,7 @@ const auth = require('../middlewares/auth');
 //router.post('/posts', postController.createPost);
 router.post('/posts', auth, postController.createPost);
 
-//router.get('/posts', postController.getAllPosts);
-
+router.get('/posts', postController.getAllPosts);
 
 //router.get('/posts/user/:userId', auth, postController.getPostsbyUser);
 router.get('/posts/user/me', auth, postController.getMyPosts);
