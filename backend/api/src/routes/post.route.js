@@ -15,8 +15,7 @@ router.get('/posts/user/me', auth, postController.getMyPosts);
 router.get('/posts/:postId', postController.getPostById);
 //router.get('/posts/:postId', auth, postController.getPostById);
 
-//router.put('/posts/:postId', postController.updatePost);
-//router.put('/posts/:postId', auth, postController.updatePost);
+router.put('/posts/:postId', auth, postController.updatePost);
 
 //router.delete('/posts/:postId', postController.deletePost);
 //router.delete('/posts/:postId', auth, postController.deletePost);
