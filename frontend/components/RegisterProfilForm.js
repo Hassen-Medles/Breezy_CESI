@@ -1,5 +1,5 @@
 "use client";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 
@@ -12,7 +12,7 @@ export default function RegisterProfilForm() {
         description: "",
         profilePicture: null,
     });
-
+    
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState("");
 
@@ -39,16 +39,18 @@ export default function RegisterProfilForm() {
         }
 
         try {
-            const token = localStorage.getItem("token");
-            const res = await fetch("http://localhost:5000/profile", {
+          const res = await fetch('http://localhost:8080/profile', {
             method: "POST",
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
             body: formData,
-            });
+            credentials: "include"
+          });
 
-            const data = await res.json();
+            let data;
+            try {
+              data = await res.json();
+            } catch {
+              data = {};
+            }
 
             if (!res.ok) {
             setError(data.message || "Une erreur est survenue lors de l'inscription.");
@@ -57,11 +59,23 @@ export default function RegisterProfilForm() {
 
             router.push("/profil");
         } catch (err) {
-            setError("Une erreur est survenue lors de l'inscription.");
+          console.error("Erreur dans :", err);
+          setError("Une erreur est survenue lors de l'inscription.");
         }
     };
 
     const openFileDialog = () => fileInputRef.current.click();
+
+    // useEffect(() => {
+    //   fetch("/profile", {
+    //     method: "GET",
+    //     credentials: "include"
+    //   }).then(res => {
+    //     if (res.status === 401) {
+    //       router.push("/");
+    //     }
+    //   });
+    // }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

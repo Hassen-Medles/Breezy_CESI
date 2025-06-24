@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const messageSchema = new mongoose.Schema({
     sender: {
@@ -19,15 +19,9 @@ const messageSchema = new mongoose.Schema({
     deleted: {
         type: Boolean,
         default: false
-    },
-    timestamps: {
-        createdAt: {
-            type: Date,
-            default: Date.now
-        },
     }
+}, {
+    timestamps: true
 });
 
-const Message = mongoose.model('Message', messageSchema);
-
-module.exports = Message;
+export default mongoose.model('Message', messageSchema);
