@@ -34,4 +34,21 @@ export default function(app) {
         return res.status(200).json({ message: "Authenticated" });
     });
     app.get("/profile", authenticateToken, authController.getProfile);
+    app.post("/notification", authenticateToken, async (req, res) => {
+        // Exemple : créer une notification (à adapter selon ton modèle)
+        // const { type, message } = req.body;
+        // const notification = new Notification({ type, user: req.user._id, message });
+        // await notification.save();
+        // res.status(201).json(notification);
+        res.status(201).json({ message: "Notification POST OK (à implémenter selon besoin)" });
+    });
+    app.get("/notification", authenticateToken, (req, res) => {
+        res.json({ message: "Notification GET OK" });
+    });
+    app.get("/accueil", authenticateToken, (req, res) => {
+        res.json({ message: "Accueil GET OK" });
+    });
+    app.get("/recherche", authenticateToken, (req, res) => {
+        res.json({ message: "Recherche GET OK" });
+    });
 }

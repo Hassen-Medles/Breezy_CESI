@@ -9,7 +9,7 @@ export default function Notifications() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/user/me", {
+    fetch("/auth/notification", {
       credentials: "include"
     })
       .then(res => {

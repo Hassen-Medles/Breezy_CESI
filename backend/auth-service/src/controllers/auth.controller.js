@@ -59,6 +59,7 @@ export const register = async (req, res) => {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: 24 * 60 * 60 * 1000
     });
 
@@ -106,6 +107,7 @@ export const verify = async (req, res) => {
     httpOnly: true,
     secure: false,
     sameSite: 'lax',
+    path: '/',
     maxAge: 24 * 60 * 60 * 1000
   });
   res.status(201).json({ message: "Compte vérifié !" });
@@ -136,6 +138,7 @@ export const login = async (req, res) => {
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
+      path: '/',
       maxAge: 24 * 60 * 60 * 1000
     });
   res.json({ message: "Connexion réussie !" });

@@ -1,3 +1,4 @@
+"use client";
 import Navbar from "../../components/Navbar";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,7 +9,7 @@ export default function Recherche() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/user/me", {
+    fetch("/auth/recherche", {
       credentials: "include"
     })
       .then(res => {
