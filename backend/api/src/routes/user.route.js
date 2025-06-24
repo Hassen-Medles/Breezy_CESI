@@ -48,7 +48,7 @@ router.get("/search", authenticateToken, async (req, res) => {
         },
         { _id: { $ne: req.user._id } } // Correction : exclusion simple
       ]
-    }).select("_id username email profilePicture description");
+    }).select("_id username email profilePicture description isPrivate");
     res.json(users);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la recherche utilisateur." });
@@ -63,6 +63,21 @@ router.get("/:id", async (req, res) => {
     res.json(user);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la récupération de l'utilisateur." });
+  }
+});
+
+// Route pour changer la visibilité du compte (public/privé)
+router.patch("/privacy", authenticateToken, async (req, res) => {
+  try {
+    const { isPrivate } = req.body;
+    if (typeof isPrivate !== "boolean") {
+      return res.status(400).json({ message: "Valeur de confidentialité invalide." });
+    }
+    req.user.isPrivate = isPrivate;
+    await req.user.save();
+    res.json({ message: `Compte mis à jour en mode ${isPrivate ? "privé" : "public"}.`, isPrivate });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la mise à jour de la confidentialité." });
   }
 });
 

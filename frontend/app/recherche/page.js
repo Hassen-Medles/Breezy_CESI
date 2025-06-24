@@ -103,6 +103,9 @@ export default function Recherche() {
                       )}
                       <span className="font-medium">{u.username}</span>
                       <span className="ml-2 text-gray-500 text-xs">{u.email}</span>
+                      <span className={`ml-3 text-xs font-semibold px-2 py-1 rounded ${u.isPrivate ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                        {u.isPrivate ? 'Privé' : 'Public'}
+                      </span>
                     </>
                   </li>
                 ))}

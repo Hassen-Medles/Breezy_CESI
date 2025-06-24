@@ -40,6 +40,14 @@ export default function ProfilUserPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <Navbar title="PROFIL" />
+      <div className="mb-4">
+        <button
+          onClick={() => router.push('/recherche')}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-full shadow"
+        >
+          ← Retour à la recherche
+        </button>
+      </div>
       <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10 mt-5">
         <div className="flex flex-col md:flex-row items-start md:gap-0 gap-6">
           <div className="flex-1 flex flex-col items-center md:items-start">
