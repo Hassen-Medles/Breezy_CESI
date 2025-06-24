@@ -8,6 +8,11 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   const [editContent, setEditContent] = useState(post.content);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
+  const [replyContent, setReplyContent] = useState("");
+  const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -36,6 +41,63 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Ajout d'un commentaire
+  const handleAddComment = async (postId, content, parent = null) => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content, parent }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
+      const { comment } = await res.json();
+      setCommentCounts(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1
+      }));
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId] ? [comment, ...prev[postId]] : [comment]
+      }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // Charger le nombre de likes et si l'utilisateur a liké
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`http://localhost:5001/api/posts/${post._id}/likes`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setLikeCount(data.count);
+          setLiked(data.liked);
+        }
+      } catch {}
+    };
+    fetchLikes();
+  }, [post._id]);
+
+  // Gérer le like/unlike
+  const handleLike = async () => {
+    setLikeLoading(true);
+    try {
+      const method = liked ? 'DELETE' : 'POST';
+      const res = await fetch(`http://localhost:5001/api/posts/${post._id}/like`, {
+        method,
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setLiked(!liked);
+        setLikeCount(prev => prev + (liked ? -1 : 1));
+      }
+    } finally {
+      setLikeLoading(false);
     }
   };
 
@@ -97,8 +159,21 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
           <span>{commentCount ?? 0}</span>
         </div>
         <div className="flex items-center">
-          <span className="material-icons text-red-500 text-base mr-1">❤️</span>
-          <span>2K</span>
+          <button
+            className={liked ? "text-red-500 text-base mr-1" : "text-gray-400 text-base mr-1"}
+            style={{ background: "none", border: "none", cursor: likeLoading ? "not-allowed" : "pointer" }}
+            title={liked ? "Je n'aime plus" : "J'aime"}
+            onClick={handleLike}
+            disabled={likeLoading}
+          >
+            <span
+              className={liked ? "heart-pop" : ""}
+              style={{ display: 'inline-block', fontSize: '1.3rem', lineHeight: 1 }}
+            >
+              {liked ? "❤️" : "🤍"}
+            </span>
+          </button>
+          <span>{likeCount}</span>
         </div>
       </div>
       {openCommentPostId === post._id && (
@@ -108,7 +183,12 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
           ) : (
             <CommentForm
               comments={comments[post._id] || []}
-              onAddComment={content => onAddComment(post._id, content)}
+              onAddComment={(content, parent) => onAddComment(post._id, content, parent)} // <-- Utilise la prop
+              allComments={comments[post._id] || []}
+              replyTo={replyTo}
+              setReplyTo={setReplyTo}
+              replyContent={replyContent}
+              setReplyContent={setReplyContent}
             />
           )}
         </div>
@@ -155,13 +235,13 @@ export default function PostCardList({ userId }) {
     }
   };
 
-  const handleAddComment = async (postId, content) => {
+  const handleAddComment = async (postId, content, parent = null) => {
     try {
       const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, parent }),
       });
       if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
       const { comment } = await res.json();
@@ -255,7 +335,7 @@ export default function PostCardList({ userId }) {
               openCommentPostId={openCommentPostId}
               comments={comments}
               loadingComments={loadingComments}
-              onAddComment={handleAddComment}
+              onAddComment={handleAddComment} // <-- Ajoute cette ligne
               commentCount={commentCounts[post._id]}
             />
           ))}
