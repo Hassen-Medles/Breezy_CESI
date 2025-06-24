@@ -10,14 +10,13 @@ export default function PostForm({ onPostCreated }) {
     setError("");
     setLoading(true);
     try {
-      const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:5001/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ content }),
+        credentials: "include",
       });
       if (!res.ok) {
         const data = await res.json();

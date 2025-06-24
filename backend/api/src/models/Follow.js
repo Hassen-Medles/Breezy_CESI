@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 const followSchema = new mongoose.Schema({
     follower: {
@@ -15,4 +15,4 @@ const followSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('Follow', followSchema);
+export default mongoose.model('Follow', followSchema);

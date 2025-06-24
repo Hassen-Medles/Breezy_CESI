@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
 
@@ -39,13 +39,14 @@ export default function RegisterForm() {
       return;
     }
     try {
-      const res = await fetch("http://localhost:5000/register", {
+      const res = await fetch("/auth/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email: form.email,
           password: form.password,
         }),
+        credentials: "include"
       });
       if (res.ok) {
         setPendingEmail(form.email);
@@ -61,91 +62,95 @@ export default function RegisterForm() {
 
   const handleCodeSubmit = async (e) => {
     e.preventDefault();
+    console.log("submit code", code, pendingEmail);
     try {
-      const res = await fetch("http://localhost:5000/verify", {
+      const res = await fetch("/auth/verify", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: pendingEmail, code }),
+        body: JSON.stringify({ email: pendingEmail, code}),
+        credentials: "include"
       });
+      console.log("/verify response", res);
       if (res.ok) {
         setShowCodeModal(false);
         setCodeError("");
-        const data = await res.json();
-        if (data.token) {
-          localStorage.setItem("token", data.token);
-          router.push("/registerprofil");
-        }
+        router.push("/registerprofil");
       } else {
-        const data = await res.json();
+        let data = {};
+        try {
+          data = await res.json();
+        } catch (err) {
+          console.error("Erreur parsing JSON /verify:", err);
+        }
         setCodeError(data.message || "Code incorrect.");
       }
     } catch (err) {
       setCodeError("Erreur de connexion au serveur.");
+      console.error("Erreur réseau /verify:", err);
     }
   };
 
   return (
     <>
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
-
-      <form
-        onSubmit={handleSubmit}
-        className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
-      >
-        <div>
-          <label className="block text-sm font-medium mb-2" htmlFor="email">
-            Email
-          </label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
-            autoComplete="email"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2" htmlFor="password">
-            Mot de passe
-          </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
-            autoComplete="new-password"
-          />
-        </div>
-        <div>
-          <label className="block text-sm font-medium mb-2" htmlFor="confirmPassword">
-            Confirmer le mot de passe
-          </label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={form.confirmPassword}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
-            autoComplete="new-password"
-          />
-        </div>
-        {error && <div className="text-red-500 text-sm text-center">{error}</div>}
-        <button
-          type="submit"
-          className="w-full bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:brightness-110 transition"
+        <form
+          onSubmit={handleSubmit}
+          className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
         >
-          Créer un compte
-        </button>
-      </form>
-
+          <div>
+            <label className="block text-sm font-medium mb-2" htmlFor="email">
+              Email
+            </label>
+            <input
+              type="email"
+              id="email"
+              name="email"
+              value={form.email}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+              autoComplete="email"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2" htmlFor="password">
+              Mot de passe
+            </label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={form.password}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+              autoComplete="new-password"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2" htmlFor="confirmPassword">
+              Confirmer le mot de passe
+            </label>
+            <input
+              type="password"
+              id="confirmPassword"
+              name="confirmPassword"
+              value={form.confirmPassword}
+              onChange={handleChange}
+              required
+              className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-sky-300 focus:border-sky-400 transition"
+              autoComplete="new-password"
+            />
+          </div>
+          {error && <div className="text-red-500 text-sm text-center">{error}</div>}
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-r from-sky-500 to-indigo-500 text-white font-semibold py-2 rounded-lg hover:brightness-110 transition"
+          >
+            Créer un compte
+          </button>
+        </form>
+      </div>
       {showCodeModal && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-xl w-full max-w-md space-y-4">
@@ -173,9 +178,6 @@ export default function RegisterForm() {
                 <button
                   type="button"
                   onClick={() => {
-                    setShowCodeModal(false);
-                    setCode("");
-                    setCodeError("");
                     router.push("/registerprofil");
                   }}
                   className="w-full ml-4 py-2 px-4 bg-gray-300 text-gray-800 font-semibold rounded-md hover:bg-gray-400 transition duration-300"
@@ -187,7 +189,6 @@ export default function RegisterForm() {
           </div>
         </div>
       )}
-    </div>
     </>
   );
 }
