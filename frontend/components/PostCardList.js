@@ -1,42 +1,41 @@
 'use client';
 import React, { useEffect, useState } from "react";
+import CommentForm from "./CommentForm";
 
-function PostCard({ post, onPostUpdated }) {
-  const [showMenu, setShowMenu] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
-  const [editContent, setEditContent] = useState(post.content);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+function PostCard({ post, onPostUpdated, openCommentPostId, setOpenCommentPostId }) {
+  const [comments, setComments] = useState([]);
+  const [loadingComments, setLoadingComments] = useState(false);
 
-  const handleEdit = () => {
-    setIsEditing(true);
-    setShowMenu(false);
-  };
+  // Charger les commentaires quand on ouvre la section
+  useEffect(() => {
+    if (openCommentPostId === post._id) {
+      setLoadingComments(true);
+      fetch(`/api/comments/post/${post._id}`)
+        .then(res => res.json())
+        .then(data => setComments(Array.isArray(data) ? data : []))
+        .catch(() => setComments([]))
+        .finally(() => setLoadingComments(false));
+    }
+  }, [openCommentPostId, post._id]);
 
-  const handleSave = async () => {
-    setLoading(true);
-    setError("");
+  // Ajouter un commentaire
+  const handleAddComment = async (content) => {
     try {
-      const res = await fetch(`http://localhost:5001/api/posts/${post._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include',
-        body: JSON.stringify({ content: editContent }),
+      const res = await fetch(`http://localhost:5001/api/comments/${post._id}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content }),
       });
-      if (!res.ok) {
-        const data = await res.json();
-        throw new Error(data.message || 'Erreur lors de la modification');
-      }
-      setIsEditing(false);
-      if (onPostUpdated) onPostUpdated();
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
+      const { comment } = await res.json();
+      setComments(prev => [...prev, comment]);
     } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
+      alert(err.message);
     }
   };
+
+  // ...le reste du composant PostCard reste inchangé jusqu'à l'affichage des commentaires...
 
   return (
     <div className="bg-gray-100 rounded-lg p-4 mb-3 flex flex-col shadow relative">
@@ -80,19 +79,26 @@ function PostCard({ post, onPostUpdated }) {
       )}
       <div className="flex items-center text-xs text-gray-400 mb-1">
         {post.createdAt && (
-          <span>{new Date(post.createdAt).toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" })} {new Date(post.createdAt).toLocaleDateString("fr-FR")}</span>
+          <span>
+            {new Date(post.createdAt).toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" })}{" "}
+            {new Date(post.createdAt).toLocaleDateString("fr-FR")}
+          </span>
         )}
+        <span className="ml-1">{comments.length}</span>
       </div>
-      <div className="flex items-center mt-1">
-        <div className="flex items-center mr-4">
-          <span className="material-icons text-black text-base mr-1">💬</span>
-          <span>125</span>
+      {/* Affiche les commentaires si la bulle est cliquée */}
+      {openCommentPostId === post._id && (
+        <div className="mt-2">
+          {loadingComments ? (
+            <div>Chargement des commentaires...</div>
+          ) : (
+            <CommentForm
+              comments={comments}
+              onAddComment={handleAddComment}
+            />
+          )}
         </div>
-        <div className="flex items-center">
-          <span className="material-icons text-red-500 text-base mr-1">❤️</span>
-          <span>2K</span>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -102,6 +108,7 @@ export default function PostCardList({ userId }) {
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [openCommentPostId, setOpenCommentPostId] = useState(null);
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -156,7 +163,13 @@ export default function PostCardList({ userId }) {
       ) : (
         <>
           {postsToShow.map((post) => (
-            <PostCard key={post._id} post={post} onPostUpdated={fetchPosts} />
+            <PostCard
+              key={post._id}
+              post={post}
+              onPostUpdated={fetchPosts}
+              openCommentPostId={openCommentPostId}
+              setOpenCommentPostId={setOpenCommentPostId}
+            />
           ))}
           {posts.length > 3 && !showAll && (
             <button
