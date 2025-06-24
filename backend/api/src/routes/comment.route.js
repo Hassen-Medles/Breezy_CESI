@@ -7,7 +7,7 @@ const router = express.Router();
 // Créer un commentaire sur un post
 router.post('/:postId', auth, async (req, res) => {
   try {
-    const { content } = req.body;
+    const { content, parent } = req.body; // Ajoute parent ici
     if (!content || content.length > 280) {
       return res.status(400).json({ message: 'Le commentaire doit faire entre 1 et 280 caractères.' });
     }
@@ -15,6 +15,7 @@ router.post('/:postId', auth, async (req, res) => {
       content,
       post: req.params.postId,
       author: req.user.userId || req.user.id,
+      parent: parent || null // Ajoute le parent si fourni
     });
     await comment.save();
     await comment.populate('author', 'username profilePicture');

@@ -8,6 +8,8 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   const [editContent, setEditContent] = useState(post.content);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [replyTo, setReplyTo] = useState(null);
+  const [replyContent, setReplyContent] = useState("");
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -36,6 +38,30 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
       setError(err.message);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // Ajout d'un commentaire
+  const handleAddComment = async (postId, content, parent = null) => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content, parent }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
+      const { comment } = await res.json();
+      setCommentCounts(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1
+      }));
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId] ? [comment, ...prev[postId]] : [comment]
+      }));
+    } catch (err) {
+      alert(err.message);
     }
   };
 
@@ -108,7 +134,12 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
           ) : (
             <CommentForm
               comments={comments[post._id] || []}
-              onAddComment={content => onAddComment(post._id, content)}
+              onAddComment={(content, parent) => onAddComment(post._id, content, parent)} // <-- Utilise la prop
+              allComments={comments[post._id] || []}
+              replyTo={replyTo}
+              setReplyTo={setReplyTo}
+              replyContent={replyContent}
+              setReplyContent={setReplyContent}
             />
           )}
         </div>
@@ -155,13 +186,13 @@ export default function PostCardList({ userId }) {
     }
   };
 
-  const handleAddComment = async (postId, content) => {
+  const handleAddComment = async (postId, content, parent = null) => {
     try {
       const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, parent }),
       });
       if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
       const { comment } = await res.json();
@@ -255,7 +286,7 @@ export default function PostCardList({ userId }) {
               openCommentPostId={openCommentPostId}
               comments={comments}
               loadingComments={loadingComments}
-              onAddComment={handleAddComment}
+              onAddComment={handleAddComment} // <-- Ajoute cette ligne
               commentCount={commentCounts[post._id]}
             />
           ))}

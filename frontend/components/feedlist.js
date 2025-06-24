@@ -69,13 +69,13 @@ const FeedList = forwardRef((props, ref) => {
   };
 
   // Ajout d'un commentaire
-  const handleAddComment = async (postId, content) => {
+  const handleAddComment = async (postId, content, parent = null) => {
     try {
       const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
-        body: JSON.stringify({ content }),
+        body: JSON.stringify({ content, parent }),
       });
       if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
       const { comment } = await res.json();
@@ -83,7 +83,6 @@ const FeedList = forwardRef((props, ref) => {
         ...prev,
         [postId]: (prev[postId] || 0) + 1
       }));
-      // Ajoute le commentaire dans le tableau local
       setComments(prev => ({
         ...prev,
         [postId]: prev[postId] ? [comment, ...prev[postId]] : [comment]
@@ -145,7 +144,8 @@ const FeedList = forwardRef((props, ref) => {
                   ) : (
                     <CommentForm
                       comments={comments[post._id] || []}
-                      onAddComment={content => handleAddComment(post._id, content)}
+                      onAddComment={(content, parent) => handleAddComment(post._id, content, parent)}
+                      allComments={comments[post._id] || []}
                     />
                   )}
                 </div>
