@@ -2,6 +2,7 @@ import express from "express";
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import cookieParser from "cookie-parser";
+import mongoose from "mongoose";
 
 const router = express.Router();
 
@@ -9,9 +10,13 @@ router.use(cookieParser());
 
 function authenticateToken(req, res, next) {
   const token = req.cookies.token;
+  console.log('Token reçu:', token);
   if (!token) return res.sendStatus(401);
   jwt.verify(token, process.env.AUTH_TOKEN, async (err, decoded) => {
-    if (err) return res.sendStatus(401);
+    if (err) {
+      console.error('Erreur JWT verify:', err);
+      return res.sendStatus(401);
+    }
     const user = await User.findById(decoded.id || decoded.userId);
     if (!user) {
       console.error("User non trouvé pour l'id :", decoded.id || decoded.userId);
@@ -25,6 +30,29 @@ function authenticateToken(req, res, next) {
 
 router.get("/me", authenticateToken, (req, res) => {
   res.json(req.user);
+});
+
+// Route de recherche utilisateur par préfixe (username ou email)
+router.get("/search", authenticateToken, async (req, res) => {
+  const query = req.query.query || "";
+  if (!query) return res.json([]);
+  try {
+    const regex = new RegExp("^" + query, "i");
+    const users = await User.find({
+      $and: [
+        {
+          $or: [
+            { username: { $regex: regex } },
+            { email: { $regex: regex } }
+          ]
+        },
+        { _id: { $ne: req.user._id } } // Correction : exclusion simple
+      ]
+    }).select("_id username email profilePicture description");
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la recherche utilisateur." });
+  }
 });
 
 export default router;
