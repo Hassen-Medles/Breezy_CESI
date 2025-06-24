@@ -1,4 +1,5 @@
 import Post from '../models/Post.js';
+import Like from '../models/Like.js';
 
 export async function createPost(req, res) {
   try {
@@ -104,5 +105,53 @@ export async function getMyPosts(req, res) {
     return res.status(200).json(posts);
   } catch (err) {
     return res.status(500).json({ message: "Erreur lors de la récupération des posts de l'utilisateur connecté.", error: err.message });
+  }
+}
+
+// Liker un post
+export async function likePost(req, res) {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const postId = req.params.postId;
+    // Vérifie si déjà liké
+    const existing = await Like.findOne({ user: userId, post: postId });
+    if (existing) {
+      return res.status(400).json({ message: 'Déjà liké.' });
+    }
+    await Like.create({ user: userId, post: postId });
+    res.status(201).json({ message: 'Post liké.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors du like.' });
+  }
+}
+
+// Unliker un post
+export async function unlikePost(req, res) {
+  try {
+    const userId = req.user.userId || req.user.id;
+    const postId = req.params.postId;
+    const deleted = await Like.findOneAndDelete({ user: userId, post: postId });
+    if (!deleted) {
+      return res.status(400).json({ message: 'Pas encore liké.' });
+    }
+    res.status(200).json({ message: 'Like retiré.' });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors du unlike.' });
+  }
+}
+
+// Récupérer le nombre de likes et si l'utilisateur a liké
+export async function getLikes(req, res) {
+  try {
+    const postId = req.params.postId;
+    const userId = req.user?.userId || req.user?.id;
+    const count = await Like.countDocuments({ post: postId });
+    let liked = false;
+    if (userId) {
+      liked = !!(await Like.findOne({ post: postId, user: userId }));
+    }
+    res.status(200).json({ count, liked });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des likes.' });
   }
 }

@@ -18,5 +18,10 @@ router.get('/posts/:postId', postController.getPostById);
 router.put('/posts/:postId', auth, postController.updatePost);
 // Supprimer un post (protégée)
 router.delete('/posts/:postId', auth, postController.deletePost);
+// Like/unlike un post
+router.post('/posts/:postId/like', auth, postController.likePost);
+router.delete('/posts/:postId/like', auth, postController.unlikePost);
+// Récupérer le nombre de likes et si l'utilisateur a liké
+router.get('/posts/:postId/likes', auth, postController.getLikes);
 
 export default router;

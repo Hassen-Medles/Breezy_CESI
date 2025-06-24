@@ -8,6 +8,29 @@ const FeedList = forwardRef((props, ref) => {
   const [comments, setComments] = useState({});
   const [loadingComments, setLoadingComments] = useState(false);
   const [commentCounts, setCommentCounts] = useState({});
+  const [likeCounts, setLikeCounts] = useState({});
+  const [likedPosts, setLikedPosts] = useState({});
+
+  // Récupère les likes pour chaque post
+  const fetchLikes = async (posts) => {
+    const counts = {};
+    const liked = {};
+    await Promise.all(
+      posts.map(async (post) => {
+        try {
+          const res = await fetch(`http://localhost:5001/api/posts/${post._id}/likes`, { credentials: 'include' });
+          const data = await res.json();
+          counts[post._id] = data.count || 0;
+          liked[post._id] = !!data.liked;
+        } catch {
+          counts[post._id] = 0;
+          liked[post._id] = false;
+        }
+      })
+    );
+    setLikeCounts(counts);
+    setLikedPosts(liked);
+  };
 
   const fetchPosts = async () => {
     setLoading(true);
@@ -15,7 +38,6 @@ const FeedList = forwardRef((props, ref) => {
       const res = await fetch("http://localhost:5001/api/posts");
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
-      // Ajoute ce bloc juste après setPosts
       if (Array.isArray(data)) {
         const counts = {};
         await Promise.all(
@@ -30,6 +52,7 @@ const FeedList = forwardRef((props, ref) => {
           })
         );
         setCommentCounts(counts);
+        await fetchLikes(data); // Ajout récupération des likes
       }
     } catch (err) {
       setPosts([]);
@@ -93,6 +116,27 @@ const FeedList = forwardRef((props, ref) => {
     }
   };
 
+  // Like/unlike un post
+  const handleLike = async (postId) => {
+    const alreadyLiked = likedPosts[postId];
+    try {
+      const url = `http://localhost:5001/api/posts/${postId}/like`;
+      const method = alreadyLiked ? 'DELETE' : 'POST';
+      const res = await fetch(url, { method, credentials: 'include' });
+      if (!res.ok) throw new Error('Erreur lors du like');
+      setLikeCounts(prev => ({
+        ...prev,
+        [postId]: prev[postId] + (alreadyLiked ? -1 : 1)
+      }));
+      setLikedPosts(prev => ({
+        ...prev,
+        [postId]: !alreadyLiked
+      }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -128,6 +172,28 @@ const FeedList = forwardRef((props, ref) => {
                 <span>
                   {post.createdAt && (new Date(post.createdAt).toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" }) + " " + new Date(post.createdAt).toLocaleDateString("fr-FR"))}
                 </span>
+                <button
+                  className={
+                    `ml-4 flex items-center gap-1 px-2 py-1 rounded-full border transition-all duration-200 ` +
+                    (likedPosts[post._id]
+                      ? 'bg-pink-100 border-pink-300 text-pink-600 shadow-sm scale-105'
+                      : 'bg-white border-gray-300 text-gray-400 hover:bg-pink-50 hover:text-pink-500')
+                  }
+                  title={likedPosts[post._id] ? "Je n'aime plus" : "J'aime"}
+                  style={{ cursor: "pointer", fontWeight: 600, fontSize: '1.1rem', minWidth: 36, position: 'relative', overflow: 'hidden' }}
+                  onClick={() => handleLike(post._id)}
+                >
+                  <span
+                    className={
+                      'transition-all duration-200 ' +
+                      (likedPosts[post._id] ? 'heart-pop' : '')
+                    }
+                    style={{ fontSize: '1.3rem', lineHeight: 1 }}
+                  >
+                    {likedPosts[post._id] ? "❤️" : "🤍"}
+                  </span>
+                  <span className="font-semibold text-sm" style={{ minWidth: 18, textAlign: 'center' }}>{likeCounts[post._id] ?? 0}</span>
+                </button>
                 <button
                   className="ml-4 text-gray-500 hover:text-blue-500"
                   title="Afficher les commentaires"
