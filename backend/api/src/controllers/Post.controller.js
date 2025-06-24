@@ -32,9 +32,7 @@ export async function getPostsbyUser(req, res) {
   try {
     const userId = req.params.userId;
     // if (req.user.id !== userId && req.user.role !== 'admin') { ... } // <-- à ajouter avec auth
-    const posts = await Post.find({ author: userId })
-      .populate('author', 'username profilePicture')
-      .sort({ createdAt: -1 });
+    const posts = await Post.find({ author: userId }).sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des posts de l\'utilisateur.' });

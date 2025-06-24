@@ -100,11 +100,7 @@ export default function ProfilPage() {
             <span className="font-semibold text-lg text-gray-800 mt-2 mb-2">Vos messages</span>
           </div>
           <div className="bg-gray-100 rounded-2xl p-6 shadow-inner">
-            {user && user._id ? (
-              <PostCardList userId={user._id} />
-            ) : (
-              <div className="text-red-500">Impossible de récupérer le profil utilisateur</div>
-            )}
+            <PostCardList />
           </div>
         </div>
         {/* Bulles */}

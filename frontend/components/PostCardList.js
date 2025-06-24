@@ -40,18 +40,8 @@ function PostCard({ post, onPostUpdated, openCommentPostId, setOpenCommentPostId
   return (
     <div className="bg-gray-100 rounded-lg p-4 mb-3 flex flex-col shadow relative">
       <div className="flex items-center mb-2">
-        {post.author?.profilePicture ? (
-          <img
-            src={post.author.profilePicture}
-            alt="Profil"
-            className="w-8 h-8 rounded-full object-cover mr-3"
-          />
-        ) : (
-          <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
-        )}
-        <span className="font-semibold text-sm">
-          {post.author?.username || post.username || "Utilisateur"}
-        </span>
+        <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
+        <span className="font-semibold text-sm">{post.author?.username || post.authorName || "Your name"}</span>
         <span className="ml-auto text-gray-400 text-xl cursor-pointer relative" onClick={() => setShowMenu(v => !v)}>•••
           {showMenu && (
             <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-10">
@@ -103,7 +93,7 @@ function PostCard({ post, onPostUpdated, openCommentPostId, setOpenCommentPostId
   );
 }
 
-export default function PostCardList({ userId }) {
+export default function PostCardList() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -113,14 +103,8 @@ export default function PostCardList({ userId }) {
   const fetchPosts = async () => {
     setLoading(true);
     setApiError("");
-    if (!userId) {
-      setApiError("ID utilisateur manquant");
-      setPosts([]);
-      setLoading(false);
-      return;
-    }
     try {
-      const res = await fetch(`http://localhost:5001/api/posts/user/${userId}`, {
+      const res = await fetch("http://localhost:5001/api/posts/user/me", {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -144,7 +128,7 @@ export default function PostCardList({ userId }) {
 
   useEffect(() => {
     fetchPosts();
-  }, [userId]);
+  }, []);
 
   const postsToShow = showAll ? posts : posts.slice(0, 3);
 
