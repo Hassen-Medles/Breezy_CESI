@@ -1,9 +1,12 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const postRoutes = require('./routes/post.route');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-require('dotenv').config();
+import express from 'express';
+import mongoose from 'mongoose';
+import postRoutes from './routes/post.route.js';
+import userRoutes from './routes/user.route.js';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import dotenv from 'dotenv';
+
+dotenv.config();
 
 const app = express();
 app.use(cors({
@@ -18,6 +21,7 @@ mongoose.connect(process.env.MONGO_URI, {})
   .catch((err) => console.error('Erreur MongoDB :', err));
 
 app.use('/api', postRoutes);
+app.use('/api/user', userRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

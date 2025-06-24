@@ -8,11 +8,15 @@ import cookieParser from "cookie-parser";
 const upload = multer({ dest: "uploads/" });
 
 function authenticateToken(req, res, next) {
-    const token = req.cookies.token; // Récupère le token du cookie
+    console.log("Appel middleware authenticateToken", req.cookies);
+    const token = req.cookies.token;
     if (!token) return res.sendStatus(401);
 
-    jwt.verify(token, process.env.AUTH_TOKEN, (err, user) => {
+    jwt.verify(token, process.env.AUTH_TOKEN, async (err, decoded) => {
         if (err) return res.sendStatus(401);
+        const user = await User.findById(decoded.id || decoded.userId);
+        console.log("User trouvé dans middleware:", user);
+        if (!user) return res.sendStatus(404);
         req.user = user;
         next();
     });
@@ -29,7 +33,5 @@ export default function(app) {
     app.get("/authenticate", authenticateToken, (req, res) => {
         return res.status(200).json({ message: "Authenticated" });
     });
-    app.get("/auth/profile", authenticateToken, (req, res) => {
-        res.status(200).json({ ok: true });
-    });
+    app.get("/profile", authenticateToken, authController.getProfile);
 }

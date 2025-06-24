@@ -1,6 +1,6 @@
-const Post = require('../models/Post');
+import Post from '../models/Post.js';
 
-exports.createPost = async (req, res) => {
+export async function createPost(req, res) {
   try {
     const { content } = req.body;
     if (!content || content.length > 280) {
@@ -15,19 +15,18 @@ exports.createPost = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la publication.' });
   }
-};
+}
 
-exports.getAllPosts = async (req, res) => {
+export async function getAllPosts(req, res) {
   try {
     const posts = await Post.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des posts.' });
   }
-};
+}
 
-
-exports.getPostsbyUser = async (req, res) => {
+export async function getPostsbyUser(req, res) {
   try {
     const userId = req.params.userId;
     // if (req.user.id !== userId && req.user.role !== 'admin') { ... } // <-- à ajouter avec auth
@@ -36,10 +35,9 @@ exports.getPostsbyUser = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération des posts de l\'utilisateur.' });
   }
-};
+}
 
-
-exports.getPostById = async (req, res) => {
+export async function getPostById(req, res) {
   try {
     const postId = req.params.postId;
     const post = await Post.findById(postId);
@@ -50,9 +48,9 @@ exports.getPostById = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la récupération du post.' });
   }
-};
+}
 
-exports.updatePost = async (req, res) => {
+export async function updatePost(req, res) {
   try {
     const postId = req.params.postId;
     const { content } = req.body;
@@ -69,9 +67,9 @@ exports.updatePost = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la mise à jour du post.' });
   }
-};
+}
 
-exports.deletePost = async (req, res) => {
+export async function deletePost(req, res) {
   try {
     const postId = req.params.postId;
     // const post = await Post.findById(postId);
@@ -84,4 +82,4 @@ exports.deletePost = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression du post.' });
   }
-};
+}

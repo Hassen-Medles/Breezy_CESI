@@ -12,17 +12,7 @@ export default function RegisterProfilForm() {
         description: "",
         profilePicture: null,
     });
-    useEffect(() => {
-      // Vérifie si l'utilisateur est authentifié avant d'afficher le formulaire
-      fetch("http://localhost:8080/auth/profile", {
-        method: "GET",
-        credentials: "include"
-      }).then(res => {
-        if (res.status === 401) {
-          router.push("/login");
-        }
-      });
-    }, []);
+    
     const [preview, setPreview] = useState(null);
     const [error, setError] = useState("");
 
@@ -49,13 +39,18 @@ export default function RegisterProfilForm() {
         }
 
         try {
-            const res = await fetch("http://localhost:8080/profile", {
-                method: "POST",
-                body: formData,
-                credentials: "include"
-            });
+          const res = await fetch('http://localhost:8080/profile', {
+            method: "POST",
+            body: formData,
+            credentials: "include"
+          });
 
-            const data = await res.json();
+            let data;
+            try {
+              data = await res.json();
+            } catch {
+              data = {};
+            }
 
             if (!res.ok) {
             setError(data.message || "Une erreur est survenue lors de l'inscription.");
@@ -64,11 +59,23 @@ export default function RegisterProfilForm() {
 
             router.push("/profil");
         } catch (err) {
-            setError("Une erreur est survenue lors de l'inscription.");
+          console.error("Erreur dans :", err);
+          setError("Une erreur est survenue lors de l'inscription.");
         }
     };
 
     const openFileDialog = () => fileInputRef.current.click();
+
+    // useEffect(() => {
+    //   fetch("/profile", {
+    //     method: "GET",
+    //     credentials: "include"
+    //   }).then(res => {
+    //     if (res.status === 401) {
+    //       router.push("/");
+    //     }
+    //   });
+    // }, []);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">

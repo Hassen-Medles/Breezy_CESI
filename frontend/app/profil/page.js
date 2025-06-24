@@ -1,3 +1,5 @@
+"use client";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import {
   FaUserCircle,
@@ -26,9 +28,9 @@ export default function ProfilPage() {
   const router = useRouter();
 
   useEffect(() => {
-    fetch("http://localhost:8080/api/user/me", {
-      credentials: "include"
-    })
+  fetch("/auth/profile", {
+    credentials: "include"
+  })
       .then(res => {
         if (!res.ok) {
           router.push("/");

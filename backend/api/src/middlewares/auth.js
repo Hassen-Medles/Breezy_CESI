@@ -1,6 +1,6 @@
-const jwt = require('jsonwebtoken');
+import jwt from 'jsonwebtoken';
 
-module.exports = (req, res, next) => {
+const auth = (req, res, next) => {
   const token = req.cookies?.token;
   if (!token) {
     return res.status(401).json({ message: 'Token manquant ou invalide.' });
@@ -10,6 +10,9 @@ module.exports = (req, res, next) => {
     req.user = decoded;
     next();
   } catch (err) {
-    return res.status(401).json({ message: 'Token invalide.' });
+    console.error('Erreur dans /profile:', err);
+    res.status(500).json({ message: 'Erreur serveur', error: err.message });
   }
 };
+
+export default auth;

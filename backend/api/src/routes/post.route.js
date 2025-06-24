@@ -1,7 +1,7 @@
-const express = require('express');
+import express from 'express';
 const router = express.Router();
-const postController = require('../controllers/Post.controller');
-const auth = require('../middlewares/auth');
+import * as postController from '../controllers/Post.controller.js';
+import auth from '../middlewares/auth.js';
 
 //router.post('/posts', postController.createPost);
 router.post('/posts', auth, postController.createPost);
@@ -20,4 +20,4 @@ router.get('/posts/:postId', postController.getPostById);
 //router.delete('/posts/:postId', postController.deletePost);
 //router.delete('/posts/:postId', auth, postController.deletePost);
 
-module.exports = router;
+export default router;
