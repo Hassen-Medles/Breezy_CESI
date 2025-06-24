@@ -84,17 +84,23 @@ export async function deletePost(req, res) {
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression du post.' });
   }
-};
+}
 
 // Récupérer les posts de l'utilisateur connecté via le JWT
-exports.getMyPosts = async (req, res) => {
+export async function getMyPosts(req, res) {
   try {
-    const userId = req.user.userId || req.user.id;
+    // On vérifie que req.user existe et contient un id
+    const user = req.user;
+    const userId = user && (user.userId || user.id || user._id);
+    if (!userId) {
+      return res.status(401).json({ message: 'Utilisateur non authentifié (userId manquant).' });
+    }
+    // Recherche des posts de l'utilisateur
     const posts = await Post.find({ author: userId })
       .populate('author', 'username profilePicture')
       .sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    return res.status(200).json(posts);
   } catch (err) {
-    res.status(500).json({ message: "Erreur lors de la récupération des posts de l'utilisateur connecté." });
+    return res.status(500).json({ message: "Erreur lors de la récupération des posts de l'utilisateur connecté.", error: err.message });
   }
-};
+}

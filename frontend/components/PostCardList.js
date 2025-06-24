@@ -17,13 +17,12 @@ function PostCard({ post, onPostUpdated }) {
     setLoading(true);
     setError("");
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch(`http://localhost:5001/api/posts/${post._id}`, {
         method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        credentials: 'include',
         body: JSON.stringify({ content: editContent }),
       });
       if (!res.ok) {
@@ -98,12 +97,11 @@ export default function PostCardList() {
     setLoading(true);
     setApiError("");
     try {
-      const token = localStorage.getItem('token');
       const res = await fetch("http://localhost:5001/api/posts/user/me", {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include',
       });
       if (!res.ok) {
         const data = await res.json();
