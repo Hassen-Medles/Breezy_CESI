@@ -160,7 +160,7 @@ export const authenticate = async (req, res, next) => {
     if (err) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const user = await User.findById(decoded.id || decoded.userId);
+    const user = await User.findById(decoded.userId || decoded.id || decoded._id)
     if (!user) return res.sendStatus(404);
       console.log("User trouvé dans middleware:", user);
       req.user = user;

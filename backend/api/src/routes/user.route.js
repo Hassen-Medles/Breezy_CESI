@@ -15,7 +15,7 @@ function authenticateToken(req, res, next) {
   if (!token) return res.sendStatus(401);
   try {
     const decoded = jwt.verify(token, process.env.AUTH_TOKEN);
-    User.findById(decoded.id || decoded.userId)
+    User.findById(decoded.userId || decoded.id || decoded._id)
       .then(user => {
         if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
         req.user = user;
