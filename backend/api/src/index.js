@@ -2,6 +2,7 @@ import express from 'express';
 import mongoose from 'mongoose';
 import postRoutes from './routes/post.route.js';
 import userRoutes from './routes/user.route.js';
+import commentRoutes from './routes/comment.route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -26,6 +27,7 @@ mongoose.connect(process.env.MONGO_URI, {})
 
 app.use('/api', postRoutes);
 app.use('/api/user', userRoutes);
+app.use('/api/comments', commentRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

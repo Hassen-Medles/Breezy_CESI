@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useState } from "react";
+import CommentForm from "./CommentForm";
 
-function PostCard({ post, onPostUpdated }) {
+function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comments, loadingComments, onAddComment, commentCount }) {
   const [showMenu, setShowMenu] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(post.content);
@@ -41,8 +42,18 @@ function PostCard({ post, onPostUpdated }) {
   return (
     <div className="bg-gray-100 rounded-lg p-4 mb-3 flex flex-col shadow relative">
       <div className="flex items-center mb-2">
-        <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
-        <span className="font-semibold text-sm">{post.author?.username || post.authorName || "Your name"}</span>
+        {post.author?.profilePicture ? (
+          <img
+            src={post.author.profilePicture}
+            alt="Profil"
+            className="w-8 h-8 rounded-full object-cover mr-3"
+          />
+        ) : (
+          <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
+        )}
+        <span className="font-semibold text-sm">
+          {post.author?.username || post.username || "Utilisateur"}
+        </span>
         <span className="ml-auto text-gray-400 text-xl cursor-pointer relative" onClick={() => setShowMenu(v => !v)}>•••
           {showMenu && (
             <div className="absolute right-0 mt-2 w-32 bg-white border rounded shadow z-10">
@@ -75,29 +86,109 @@ function PostCard({ post, onPostUpdated }) {
       </div>
       <div className="flex items-center mt-1">
         <div className="flex items-center mr-4">
-          <span className="material-icons text-black text-base mr-1">💬</span>
-          <span>125</span>
+          <button
+            className="text-black text-base mr-1"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+            title="Afficher les commentaires"
+            onClick={() => onOpenComments(post._id)}
+          >
+            💬
+          </button>
+          <span>{commentCount ?? 0}</span>
         </div>
         <div className="flex items-center">
           <span className="material-icons text-red-500 text-base mr-1">❤️</span>
           <span>2K</span>
         </div>
       </div>
+      {openCommentPostId === post._id && (
+        <div className="mt-2 w-full">
+          {loadingComments ? (
+            <div>Chargement des commentaires...</div>
+          ) : (
+            <CommentForm
+              comments={comments[post._id] || []}
+              onAddComment={content => onAddComment(post._id, content)}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
 
-export default function PostCardList() {
+export default function PostCardList({ userId }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [apiError, setApiError] = useState("");
+  const [openCommentPostId, setOpenCommentPostId] = useState(null);
+  const [comments, setComments] = useState({});
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentCounts, setCommentCounts] = useState({});
+
+  const fetchComments = async (postId) => {
+    setLoadingComments(true);
+    try {
+      const res = await fetch(`http://localhost:5001/api/comments/post/${postId}`);
+      const data = await res.json();
+      setComments(prev => ({
+        ...prev,
+        [postId]: Array.isArray(data) ? data : []
+      }));
+    } catch {
+      setComments(prev => ({
+        ...prev,
+        [postId]: []
+      }));
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  const handleOpenComments = (postId) => {
+    if (openCommentPostId === postId) {
+      setOpenCommentPostId(null);
+    } else {
+      setOpenCommentPostId(postId);
+      fetchComments(postId);
+    }
+  };
+
+  const handleAddComment = async (postId, content) => {
+    try {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
+      const { comment } = await res.json();
+      setCommentCounts(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1
+      }));
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId] ? [comment, ...prev[postId]] : [comment]
+      }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
 
   const fetchPosts = async () => {
     setLoading(true);
     setApiError("");
+    if (!userId) {
+      setApiError("ID utilisateur manquant");
+      setPosts([]);
+      setLoading(false);
+      return;
+    }
     try {
-      const res = await fetch("http://localhost:5001/api/posts/user/me", {
+      const res = await fetch(`http://localhost:5001/api/posts/user/${userId}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -111,6 +202,22 @@ export default function PostCardList() {
       }
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
+      // Charger les compteurs de commentaires
+      if (Array.isArray(data)) {
+        const counts = {};
+        await Promise.all(
+          data.map(async post => {
+            try {
+              const res = await fetch(`http://localhost:5001/api/comments/post/${post._id}`);
+              const comments = await res.json();
+              counts[post._id] = Array.isArray(comments) ? comments.length : 0;
+            } catch {
+              counts[post._id] = 0;
+            }
+          })
+        );
+        setCommentCounts(counts);
+      }
     } catch (err) {
       setApiError('Erreur réseau ou serveur.');
       setPosts([]);
@@ -121,7 +228,7 @@ export default function PostCardList() {
 
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [userId]);
 
   const postsToShow = showAll ? posts : posts.slice(0, 3);
 
@@ -140,7 +247,17 @@ export default function PostCardList() {
       ) : (
         <>
           {postsToShow.map((post) => (
-            <PostCard key={post._id} post={post} onPostUpdated={fetchPosts} />
+            <PostCard
+              key={post._id}
+              post={post}
+              onPostUpdated={fetchPosts}
+              onOpenComments={handleOpenComments}
+              openCommentPostId={openCommentPostId}
+              comments={comments}
+              loadingComments={loadingComments}
+              onAddComment={handleAddComment}
+              commentCount={commentCounts[post._id]}
+            />
           ))}
           {posts.length > 3 && !showAll && (
             <button
