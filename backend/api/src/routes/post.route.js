@@ -10,6 +10,8 @@ router.post('/posts', auth, postController.createPost);
 router.get('/posts', postController.getAllPosts);
 // Récupérer les posts d'un utilisateur (protégée)
 router.get('/posts/user/:userId', auth, postController.getPostsbyUser);
+// Récupérer les posts de l'utilisateur connecté (protégée)
+router.get('/posts/user/me', auth, postController.getMyPosts);
 // Récupérer un post par son id (public)
 router.get('/posts/:postId', postController.getPostById);
 // Modifier un post (protégée)
