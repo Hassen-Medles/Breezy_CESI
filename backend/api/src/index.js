@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import postRoutes from './routes/post.route.js';
 import userRoutes from './routes/user.route.js';
 import commentRoutes from './routes/comment.route.js';
+import friendRoutes from './routes/friend.route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -17,6 +18,7 @@ app.use(cors({
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
+  exposedHeaders: ["Set-Cookie"]
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -28,6 +30,7 @@ mongoose.connect(process.env.MONGO_URI, {})
 app.use('/api', postRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/comments', commentRoutes);
+app.use('/api/friend', friendRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

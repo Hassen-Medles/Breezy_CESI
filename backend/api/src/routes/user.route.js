@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
+import Notification from "../models/Notification.js";
 
 const router = express.Router();
 
@@ -12,20 +13,18 @@ function authenticateToken(req, res, next) {
   const token = req.cookies.token;
   console.log('Token reçu:', token);
   if (!token) return res.sendStatus(401);
-  jwt.verify(token, process.env.AUTH_TOKEN, async (err, decoded) => {
-    if (err) {
-      console.error('Erreur JWT verify:', err);
-      return res.sendStatus(401);
-    }
-    const user = await User.findById(decoded.id || decoded.userId);
-    if (!user) {
-      console.error("User non trouvé pour l'id :", decoded.id || decoded.userId);
-      return res.status(404).json({ message: "Utilisateur non trouvé." });
-    }
-    req.user = user;
-    console.log("User trouvé dans middleware:", user);
-    next();
-  });
+  try {
+    const decoded = jwt.verify(token, process.env.AUTH_TOKEN);
+    User.findById(decoded.id || decoded.userId)
+      .then(user => {
+        if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
+        req.user = user;
+        next();
+      })
+      .catch(() => res.sendStatus(401));
+  } catch (e) {
+    return res.sendStatus(401);
+  }
 }
 
 router.get("/me", authenticateToken, (req, res) => {
@@ -78,6 +77,16 @@ router.patch("/privacy", authenticateToken, async (req, res) => {
     res.json({ message: `Compte mis à jour en mode ${isPrivate ? "privé" : "public"}.`, isPrivate });
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la mise à jour de la confidentialité." });
+  }
+});
+
+// Récupérer les notifications de l'utilisateur connecté
+router.get("/notification", authenticateToken, async (req, res) => {
+  try {
+    const notifications = await Notification.find({ user: req.user._id }).sort({ createdAt: -1 });
+    res.json(notifications);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération des notifications." });
   }
 });
 

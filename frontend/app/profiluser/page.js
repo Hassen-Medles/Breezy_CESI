@@ -4,6 +4,20 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { FaUserCircle } from "react-icons/fa";
 import Navbar from "../../components/Navbar";
 import { Footer } from "../../components/FooterSwitcher/Footers";
+import FollowButton from "../../components/FollowButton";
+
+function getUserIdFromCookie() {
+  if (typeof document === 'undefined') return null;
+  const match = document.cookie.match(/(?:^|; )token=([^;]+)/);
+  if (!match) return null;
+  try {
+    const token = decodeURIComponent(match[1]);
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.userId || payload.id || payload._id || null;
+  } catch {
+    return null;
+  }
+}
 
 export default function ProfilUserPage() {
   const [user, setUser] = useState(null);
@@ -67,6 +81,12 @@ export default function ProfilUserPage() {
                 </div>
               </div>
             </div>
+            {/* Bouton suivre/ne plus suivre */}
+            {user && user._id !== undefined && typeof window !== 'undefined' && user._id !== getUserIdFromCookie() && (
+              <div className="mt-6">
+                <FollowButton userId={user._id} isPrivate={user.isPrivate} />
+              </div>
+            )}
           </div>
           {/* Infos centrées */}
           <div className="flex-1 flex flex-col items-center justify-center text-center">

@@ -14,7 +14,12 @@ function authenticateToken(req, res, next) {
 
     jwt.verify(token, process.env.AUTH_TOKEN, async (err, decoded) => {
         if (err) return res.sendStatus(401);
-        const user = await User.findById(decoded.id || decoded.userId);
+        // Log le contenu du token pour debug
+        console.log('Decoded JWT:', decoded);
+        // Prends en priorité userId, puis id, puis _id
+        const userId = decoded.userId || decoded.id || decoded._id;
+        if (!userId) return res.status(401).json({ message: "Token sans identifiant utilisateur." });
+        const user = await User.findById(userId);
         console.log("User trouvé dans middleware:", user);
         if (!user) return res.sendStatus(404);
         req.user = user;
