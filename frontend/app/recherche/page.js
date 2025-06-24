@@ -70,7 +70,7 @@ export default function Recherche() {
   }
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
-      <Navbar title={<span className="text-2xl font-bold text-center block mb-2">POUR <span className="text-green-500">VOUS</span></span>} />
+      <Navbar title="RECHERCHE"/>
       <div className="relative flex items-center bg-white rounded-full shadow px-4 py-2 mx-2 mt-4 mb-4">
         <input
           type="text"
@@ -90,14 +90,20 @@ export default function Recherche() {
             ) : users.length > 0 ? (
               <ul>
                 {users.map(u => (
-                  <li key={u._id} className="flex items-center py-2 px-4 border-b last:border-b-0 hover:bg-gray-100 cursor-pointer">
-                    {u.profilePicture ? (
-                      <img src={u.profilePicture} alt={u.username} className="w-8 h-8 rounded-full mr-3" />
-                    ) : (
-                      <div className="w-8 h-8 rounded-full bg-gray-200 mr-3" />
-                    )}
-                    <span className="font-medium">{u.username}</span>
-                    <span className="ml-2 text-gray-500 text-xs">{u.email}</span>
+                  <li
+                    key={u._id}
+                    className="flex items-center py-2 px-4 border-b last:border-b-0 hover:bg-gray-100 cursor-pointer"
+                    onClick={() => router.push(`/profiluser?id=${u._id}`)}
+                  >
+                    <>
+                      {u.profilePicture ? (
+                        <img src={u.profilePicture} alt={u.username} className="w-8 h-8 rounded-full mr-3" />
+                      ) : (
+                        <div className="w-8 h-8 rounded-full bg-gray-200 mr-3"></div>
+                      )}
+                      <span className="font-medium">{u.username}</span>
+                      <span className="ml-2 text-gray-500 text-xs">{u.email}</span>
+                    </>
                   </li>
                 ))}
               </ul>

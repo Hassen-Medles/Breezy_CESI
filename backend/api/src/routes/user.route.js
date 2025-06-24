@@ -55,4 +55,15 @@ router.get("/search", authenticateToken, async (req, res) => {
   }
 });
 
+// Route publique pour obtenir les infos d'un utilisateur par son id
+router.get("/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("_id username email profilePicture description followers following");
+    if (!user) return res.status(404).json({ message: "Utilisateur non trouvé." });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération de l'utilisateur." });
+  }
+});
+
 export default router;
