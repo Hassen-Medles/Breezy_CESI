@@ -10,6 +10,9 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   const [error, setError] = useState("");
   const [replyTo, setReplyTo] = useState(null);
   const [replyContent, setReplyContent] = useState("");
+  const [likeCount, setLikeCount] = useState(0);
+  const [liked, setLiked] = useState(false);
+  const [likeLoading, setLikeLoading] = useState(false);
 
   const handleEdit = () => {
     setIsEditing(true);
@@ -62,6 +65,39 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
       }));
     } catch (err) {
       alert(err.message);
+    }
+  };
+
+  // Charger le nombre de likes et si l'utilisateur a liké
+  useEffect(() => {
+    const fetchLikes = async () => {
+      try {
+        const res = await fetch(`http://localhost:5001/api/posts/${post._id}/likes`, { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setLikeCount(data.count);
+          setLiked(data.liked);
+        }
+      } catch {}
+    };
+    fetchLikes();
+  }, [post._id]);
+
+  // Gérer le like/unlike
+  const handleLike = async () => {
+    setLikeLoading(true);
+    try {
+      const method = liked ? 'DELETE' : 'POST';
+      const res = await fetch(`http://localhost:5001/api/posts/${post._id}/like`, {
+        method,
+        credentials: 'include',
+      });
+      if (res.ok) {
+        setLiked(!liked);
+        setLikeCount(prev => prev + (liked ? -1 : 1));
+      }
+    } finally {
+      setLikeLoading(false);
     }
   };
 
@@ -123,8 +159,21 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
           <span>{commentCount ?? 0}</span>
         </div>
         <div className="flex items-center">
-          <span className="material-icons text-red-500 text-base mr-1">❤️</span>
-          <span>2K</span>
+          <button
+            className={liked ? "text-red-500 text-base mr-1" : "text-gray-400 text-base mr-1"}
+            style={{ background: "none", border: "none", cursor: likeLoading ? "not-allowed" : "pointer" }}
+            title={liked ? "Je n'aime plus" : "J'aime"}
+            onClick={handleLike}
+            disabled={likeLoading}
+          >
+            <span
+              className={liked ? "heart-pop" : ""}
+              style={{ display: 'inline-block', fontSize: '1.3rem', lineHeight: 1 }}
+            >
+              {liked ? "❤️" : "🤍"}
+            </span>
+          </button>
+          <span>{likeCount}</span>
         </div>
       </div>
       {openCommentPostId === post._id && (
