@@ -1,22 +1,20 @@
 import express from 'express';
-const router = express.Router();
 import * as postController from '../controllers/Post.controller.js';
 import auth from '../middlewares/auth.js';
 
-//router.post('/posts', postController.createPost);
+const router = express.Router();
+
+// Création d'un post (protégée)
 router.post('/posts', auth, postController.createPost);
-
+// Récupérer tous les posts (public)
 router.get('/posts', postController.getAllPosts);
-
-//router.get('/posts/user/:userId', auth, postController.getPostsbyUser);
-router.get('/posts/user/me', auth, postController.getMyPosts);
-
+// Récupérer les posts d'un utilisateur (protégée)
+router.get('/posts/user/:userId', auth, postController.getPostsbyUser);
+// Récupérer un post par son id (public)
 router.get('/posts/:postId', postController.getPostById);
-//router.get('/posts/:postId', auth, postController.getPostById);
-
+// Modifier un post (protégée)
 router.put('/posts/:postId', auth, postController.updatePost);
-
-//router.delete('/posts/:postId', postController.deletePost);
-//router.delete('/posts/:postId', auth, postController.deletePost);
+// Supprimer un post (protégée)
+router.delete('/posts/:postId', auth, postController.deletePost);
 
 export default router;

@@ -14,19 +14,30 @@ export default function Accueil() {
     fetch("/auth/accueil", {
       credentials: "include"
     })
-      .then(res => {
+      .then(async res => {
         if (!res.ok) {
+          // Essaye de lire le JSON, sinon ignore l'erreur de parsing
+          try { await res.json(); } catch {}
           router.push("/");
+          setLoading(false);
+          return null;
+        }
+        // Vérifie que la réponse est bien du JSON
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          router.push("/");
+          setLoading(false);
           return null;
         }
         return res.json();
       })
       .then(data => {
-        setUser(data);
+        if (data) setUser(data);
         setLoading(false);
       })
       .catch(() => {
         router.push("/");
+        setLoading(false);
       });
   }, [router]);
 
