@@ -15,12 +15,13 @@ import PostCardList from "../../components/PostCardList";
 export default function ProfilPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 });
   const router = useRouter();
 
   useEffect(() => {
-  fetch("/auth/profile", {
-    credentials: "include"
-  })
+    fetch("/auth/profile", {
+      credentials: "include"
+    })
       .then(res => {
         if (!res.ok) {
           router.push("/");
@@ -31,6 +32,11 @@ export default function ProfilPage() {
       .then(data => {
         setUser(data);
         setLoading(false);
+        if (data && data._id) {
+          fetch(`/api/user/${data._id}/follow-counts`, { credentials: "include" })
+            .then(res => res.ok ? res.json() : { followers: 0, following: 0 })
+            .then(setFollowCounts);
+        }
       })
       .catch(() => {
         router.push("/");
@@ -78,11 +84,11 @@ export default function ProfilPage() {
             </h1>
             <div className="flex gap-10 mt-3 justify-center">
               <div>
-                <p className="text-2xl font-bold text-gray-800">345</p>
-                <p className="text-sm text-gray-500">Abonnement</p>
+                <p className="text-2xl font-bold text-gray-800">{followCounts.following}</p>
+                <p className="text-sm text-gray-500">Abonnées</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-800">345</p>
+                <p className="text-2xl font-bold text-gray-800">{followCounts.followers}</p>
                 <p className="text-sm text-gray-500">Suivie</p>
               </div>
             </div>

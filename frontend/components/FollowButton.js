@@ -21,6 +21,13 @@ export default function FollowButton({ userId, isPrivate, refreshProfile }) {
     reloadStatus();
   }, [userId]);
 
+  // Ajout d'un effet pour recharger l'état après acceptation/refus (si refreshProfile change)
+  useEffect(() => {
+    if (refreshProfile) reloadStatus();
+    // Optionnel: on peut aussi forcer un reload après un court délai
+    // setTimeout(reloadStatus, 300);
+  }, [refreshProfile]);
+
   const handleFollow = async () => {
     setLoading(true);
     setError("");

@@ -22,6 +22,7 @@ function getUserIdFromCookie() {
 export default function ProfilUserPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [followCounts, setFollowCounts] = useState({ followers: 0, following: 0 });
   const searchParams = useSearchParams();
   const router = useRouter();
   const userId = searchParams.get("id");
@@ -42,6 +43,11 @@ export default function ProfilUserPage() {
       .then(data => {
         setUser(data);
         setLoading(false);
+        if (data && data._id) {
+          fetch(`/api/user/${data._id}/follow-counts`, { credentials: "include" })
+            .then(res => res.ok ? res.json() : { followers: 0, following: 0 })
+            .then(setFollowCounts);
+        }
       })
       .catch(() => {
         router.push("/recherche");
@@ -95,12 +101,12 @@ export default function ProfilUserPage() {
             </h1>
             <div className="flex gap-10 mt-3 justify-center">
               <div>
-                <p className="text-2xl font-bold text-gray-800">{user?.followers?.length ?? 0}</p>
-                <p className="text-sm text-gray-500">Abonnés</p>
+                <p className="text-2xl font-bold text-gray-800">{followCounts.following}</p>
+                <p className="text-sm text-gray-500">Abonnées</p>
               </div>
               <div>
-                <p className="text-2xl font-bold text-gray-800">{user?.following?.length ?? 0}</p>
-                <p className="text-sm text-gray-500">Suivis</p>
+                <p className="text-2xl font-bold text-gray-800">{followCounts.followers}</p>
+                <p className="text-sm text-gray-500">Suivie</p>
               </div>
             </div>
             <div className="md:w-[385px] mt-7">

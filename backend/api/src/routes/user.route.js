@@ -4,6 +4,7 @@ import User from "../models/User.js";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import Notification from "../models/Notification.js";
+import Follow from "../models/Follow.js";
 
 const router = express.Router();
 
@@ -87,6 +88,21 @@ router.get("/notification", authenticateToken, async (req, res) => {
     res.json(notifications);
   } catch (err) {
     res.status(500).json({ message: "Erreur lors de la récupération des notifications." });
+  }
+});
+
+// Route pour obtenir le nombre d'abonnés et d'abonnements d'un utilisateur
+router.get("/:id/follow-counts", async (req, res) => {
+  try {
+    const userId = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({ message: "ID utilisateur invalide." });
+    }
+    const followers = await Follow.countDocuments({ followed: userId });
+    const following = await Follow.countDocuments({ follower: userId });
+    res.json({ followers, following });
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors du comptage des abonnés/abonnements." });
   }
 });
 
