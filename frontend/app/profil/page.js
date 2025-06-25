@@ -49,13 +49,16 @@ export default function ProfilPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <Navbar title="PROFIL" />
-      <div className="w-full max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-10 mt-5">
-        <div className="flex flex-col md:flex-row items-start md:gap-0 gap-6">
-          <div className="flex-1 flex flex-col items-center md:items-start">
-            {/* Avatar */}
-            <div className="flex-shrink-0 flex justify-center md:justify-start w-full md:w-auto md:ml-16">
-              <div className="w-36 h-36 rounded-full bg-gradient-to-tr from-sky-400 to-indigo-400 p-1 shadow">
-                <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-xl px-8 py-10 mt-8 space-y-10">
+        {/* Section Profil en ligne */}
+        <div className="flex flex-col-reverse md:flex-row items-center md:items-start md:space-x-10 space-y-4 md:space-y-0">
+          {/* Infos utilisateur à gauche (ou en haut sur mobile) */}
+          <div className="flex flex-row items-center justify-center md:justify-start space-x-8 md:space-x-20 w-full h-full">
+            {/* Avatar à gauche */}
+            <div className="flex flex-col items-center md:items-start w-fit">
+              <div className="flex-shrink-0 w-20 h-20 md:w-36 md:h-36 md:-ml-8"> {/* Décalage à gauche sur desktop */}
+                <div className="w-full h-full rounded-full bg-gradient-to-tr from-sky-400 to-indigo-400 p-1 shadow-md">
+                  <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
                     {user && user.profilePicture ? (
                       <img
                         src={user.profilePicture}
@@ -63,48 +66,47 @@ export default function ProfilPage() {
                         className="w-full h-full object-cover rounded-full"
                       />
                     ) : (
-                      <FaUserCircle size={110} className="text-sky-300" />
+                      <FaUserCircle size={50} className="md:size-[110px] text-sky-300" />
                     )}
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="flex gap-6 justify-center md:justify-start mt-12">
-              <button
-                className="bg-gray-200 text-gray-600 py-2 px-7 rounded-xl font-semibold hover:bg-gray-300"
-                onClick={() => window.location.href = '/parametres'}
-              >
-                Paramètre
-              </button>
-            </div>
-          </div>
-          {/* Infos centrées */}
-          <div className="flex-1 flex flex-col items-center justify-center text-center">
-            <h1 className="text-2xl font-bold text-gray-800">
-              {user ? user.username : "Pseudos"}
-            </h1>
-            <div className="flex gap-10 mt-3 justify-center">
-              <div>
-                <p className="text-2xl font-bold text-gray-800">{followCounts.following}</p>
-                <p className="text-sm text-gray-500">Abonnées</p>
-              </div>
-              <div>
-                <p className="text-2xl font-bold text-gray-800">{followCounts.followers}</p>
-                <p className="text-sm text-gray-500">Suivie</p>
-              </div>
-            </div>
-            <div className="md:w-[385px] mt-7">
-              <p className="text-base text-gray-600 text-justify break-words">
+              <p className="text-xs mt-5 md:text-base text-gray-600 max-w-xs md:max-w-md break-words">
                 {user ? user.description : "Description"}
               </p>
             </div>
+            {/* Infos utilisateur à droite */}
+            <div className="flex flex-col items-center justify-center text-center space-y-2 w-1/2 self-start md:self-center -mt-4">
+              {/* Nom */}
+              <h1 className="text-base md:text-2xl font-bold text-gray-800 break-all truncate">
+                {user ? user.username : "Pseudos"}
+              </h1>
+              {/* Stats */}
+              <div className="flex gap-8 md:gap-16 justify-center items-center w-full">
+                <div className="text-center">
+                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.following}</p>
+                  <p className="text-xs md:text-sm text-gray-500">Abonnés</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.followers}</p>
+                  <p className="text-xs md:text-sm text-gray-500">Suivis</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-
+        {/* Description et bouton paramètres sous la photo, alignés à gauche */}
+        <div className="flex flex-col items-start md:ml-12 mt-2 mb-4">
+          <button
+            className="mt-2 bg-gray-200 text-gray-700 py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-gray-300"
+            onClick={() => window.location.href = '/parametres'}
+          >
+            Paramètres
+          </button>
+        </div>
         {/* Messages dynamiques */}
-        <div className="mt-4">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-semibold text-lg text-gray-800 mt-2 mb-2">Vos messages</span>
-          </div>
+        <div className="space-y-4">
+          <h2 className="text-lg font-semibold text-gray-800">Vos messages</h2>
           <div className="bg-gray-100 rounded-2xl p-6 shadow-inner">
             {user && user._id ? (
               <PostCardList userId={user._id} />
@@ -113,8 +115,9 @@ export default function ProfilPage() {
             )}
           </div>
         </div>
+
         {/* Bulles */}
-        <div className="flex justify-between mt-10 px-4 md:px-16">
+        <div className="flex justify-center gap-8 flex-wrap mt-6">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="flex flex-col items-center">
               <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center border-2 border-gray-300">

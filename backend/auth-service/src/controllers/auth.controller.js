@@ -61,7 +61,7 @@ export const register = async (req, res) => {
       sameSite: 'lax',
       path: '/',
       maxAge: 24 * 60 * 60 * 1000,
-      domain: 'localhost'
+      //domain: 'localhost'
     });
 
     // Log avant l'envoi du mail
