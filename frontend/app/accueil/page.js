@@ -56,6 +56,7 @@ export default function Accueil() {
   return (
     <>
       <Navbar title="POUR VOUS" />
+      <div className="h-20" />
       <PostForm onPostCreated={handlePostCreated} />
       <FeedList ref={feedListRef} />  
     </>

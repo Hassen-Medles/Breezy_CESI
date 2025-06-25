@@ -43,6 +43,7 @@ export default function Notifications() {
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
       <Navbar title="NOTIFICATIONS" />
+      <div className="h-20" />
       <div className="max-w-md mx-auto mt-6">
         <span className="block font-semibold text-lg mb-2">Demande d’amis</span>
         {requests.length === 0 && <div className="text-gray-400">Aucune demande</div>}
