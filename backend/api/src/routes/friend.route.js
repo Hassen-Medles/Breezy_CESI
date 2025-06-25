@@ -35,6 +35,17 @@ function authenticateToken(req, res, next) {
   }
 }
 
+// Vérifier si un utilisateur donné suit l'utilisateur connecté
+router.get("/isfollower/:userId", authenticateToken, async (req, res) => {
+  const myId = req.user._id;
+  const otherId = req.params.userId;
+  if (!mongoose.Types.ObjectId.isValid(myId) || !mongoose.Types.ObjectId.isValid(otherId)) {
+    return res.json({ following: false });
+  }
+  const follow = await Follow.findOne({ follower: otherId, followed: myId });
+  res.json({ following: !!follow });
+});
+
 // Envoyer une demande d'ami ou suivre directement si public
 router.post("/request", authenticateToken, async (req, res) => {
   const { toUserId } = req.body;
@@ -147,6 +158,16 @@ router.get("/following/:userId", authenticateToken, async (req, res) => {
   const pending = await FriendRequest.findOne({ from: followerId, to: userId, status: 'pending' });
   if (pending) return res.json({ following: false, pending: true });
   res.json({ following: false, pending: false });
+});
+
+// Récupérer la liste des utilisateurs suivis par l'utilisateur connecté
+router.get("/following", authenticateToken, async (req, res) => {
+  try {
+    const follows = await Follow.find({ follower: req.user._id }).populate("followed", "username profilePicture");
+    res.json(follows.map(f => f.followed));
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération des suivis." });
+  }
 });
 
 export default router;

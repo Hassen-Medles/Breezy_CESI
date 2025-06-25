@@ -4,6 +4,8 @@ import postRoutes from './routes/post.route.js';
 import userRoutes from './routes/user.route.js';
 import commentRoutes from './routes/comment.route.js';
 import friendRoutes from './routes/friend.route.js';
+import conversationRoutes from './routes/conversation.route.js';
+import messageRoutes from './routes/message.route.js';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
@@ -31,6 +33,8 @@ app.use('/api', postRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/friend', friendRoutes);
+app.use('/api/conversations', conversationRoutes);
+app.use('/api/messages', messageRoutes);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
