@@ -47,9 +47,9 @@ export default function ProfilPage() {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
   return (
-    <div className="min-h-screen bg-gray-50 pb-24">
+    <div className="h-screen bg-gray-50 overflow-hidden">
       <Navbar title="PROFIL" />
-      <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-xl px-8 py-10 mt-8 space-y-10">
+      <div className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-xl px-8 py-10 mt-8 space-y-10 flex-1 flex flex-col overflow-auto">
         {/* Section Profil en ligne */}
         <div className="flex flex-col-reverse md:flex-row items-center md:items-start md:space-x-10 space-y-4 md:space-y-0">
           {/* Infos utilisateur à gauche (ou en haut sur mobile) */}
@@ -64,6 +64,10 @@ export default function ProfilPage() {
                         src={user.profilePicture}
                         alt="Photo de profil"
                         className="w-full h-full object-cover rounded-full"
+                        onError={e => {
+                          e.target.onerror = null;
+                          e.target.src = '/defaultimage.png';
+                        }}
                       />
                     ) : (
                       <FaUserCircle size={50} className="md:size-[110px] text-sky-300" />
@@ -71,12 +75,10 @@ export default function ProfilPage() {
                   </div>
                 </div>
               </div>
-              <p className="text-xs mt-5 md:text-base text-gray-600 max-w-xs md:max-w-md break-words">
-                {user ? user.description : "Description"}
-              </p>
+
             </div>
             {/* Infos utilisateur à droite */}
-            <div className="flex flex-col items-center justify-center text-center space-y-2 w-1/2 self-start md:self-center -mt-4">
+            <div className="flex flex-col mt-2 items-center justify-center text-center space-y-2 w-1/2 self-start md:self-center -mt-4">
               {/* Nom */}
               <h1 className="text-base md:text-2xl font-bold text-gray-800 break-all truncate">
                 {user ? user.username : "Pseudos"}
@@ -97,17 +99,23 @@ export default function ProfilPage() {
         </div>
         {/* Description et bouton paramètres sous la photo, alignés à gauche */}
         <div className="flex flex-col items-start md:ml-12 mt-2 mb-4">
+          <p
+            className="text-xs px-3 md:text-base text-gray-600 max-w-xs break-words"
+            style={{ marginTop: '-20px' }}
+          >
+            {user ? user.description : "Description"}
+          </p>
           <button
-            className="mt-2 bg-gray-200 text-gray-700 py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-gray-300"
+            className="mt-5 bg-gray-200 text-gray-700 py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-gray-300"
             onClick={() => window.location.href = '/parametres'}
           >
             Paramètres
           </button>
         </div>
         {/* Messages dynamiques */}
-        <div className="space-y-4">
+        <div className="space-y-4 flex-1">
           <h2 className="text-lg font-semibold text-gray-800">Vos messages</h2>
-          <div className="bg-gray-100 rounded-2xl p-6 shadow-inner">
+          <div className="bg-gray-100 rounded-2xl p-6 shadow-inner min-h-[250px] flex flex-col justify-center">
             {user && user._id ? (
               <PostCardList userId={user._id} />
             ) : (

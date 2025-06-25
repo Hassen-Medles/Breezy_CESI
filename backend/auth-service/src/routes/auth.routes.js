@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import multer from "multer";
 import User from "../models/user.model.js";
 import cookieParser from "cookie-parser";
+import express from "express";
 
 const upload = multer({ dest: "uploads/" });
 
@@ -56,4 +57,11 @@ export default function(app) {
     app.get("/recherche", authenticateToken, (req, res) => {
         res.json({ message: "Recherche GET OK" });
     });
+
+    app.use('/uploads', express.static('uploads', {
+        // Autorise le partage de fichiers statiques pour le frontend
+        setHeaders: (res, path) => {
+            res.set('Access-Control-Allow-Origin', '*');
+        }
+    }));
 }
