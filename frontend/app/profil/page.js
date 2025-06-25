@@ -60,7 +60,7 @@ export default function ProfilPage() {
           {/* Infos utilisateur à gauche (ou en haut sur mobile) */}
           <div className="flex flex-row items-center justify-center md:justify-start space-x-8 md:space-x-20 w-full h-full">
             {/* Avatar à gauche */}
-            <div className="flex flex-col items-center md:items-start w-fit">
+            <div className="flex mt-4 flex-col items-center md:items-start w-fit">
               <div className="flex-shrink-0 w-20 h-20 md:w-36 md:h-36 md:-ml-8"> {/* Décalage à gauche sur desktop */}
                 <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
                   {user && user.profilePicture ? (
@@ -82,7 +82,7 @@ export default function ProfilPage() {
 
             </div>
             {/* Infos utilisateur à droite */}
-            <div className="flex flex-col mt-2 items-center justify-center text-center space-y-2 w-1/2 self-start md:self-center -mt-4">
+            <div className="flex mt-5 flex-col items-center justify-center text-center space-y-2 w-1/2 self-start md:self-center -mt-4">
               {/* Nom */}
               <h1 className="text-base md:text-2xl font-bold text-gray-800 break-all truncate">
                 {user ? user.username : "Pseudos"}

@@ -1,6 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
+import { FaArrowLeft, FaGlobe, FaUserShield, FaMoon, FaSignOutAlt } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import Navbar from "../../components/Navbar";
 
 const LANGUAGES = [
   { code: "fr", label: "Français" },
@@ -55,36 +57,81 @@ export default function ParametresPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center pt-8">
-      <h1 className="text-2xl font-bold mb-6 text-green-600">PARAMETRES</h1>
-      <div className="w-full max-w-xs flex flex-col gap-4">
-        <div className="bg-white rounded-lg shadow p-4">
-          <span className="block font-semibold mb-2">Langue</span>
-          <div className="flex flex-col gap-2">
-            {LANGUAGES.map(l => (
+    <div className="min-h-screen bg-white flex flex-col items-center">
+      {/* Navbar sticky en haut */}
+      <Navbar title="PARAMETRE" />
+      {/* Espace pour la navbar sticky */}
+      <div className="h-20" />
+      <div className="w-full flex flex-col gap-8 mt-2 px-2 sm:px-4 items-center">
+        <div className="w-full max-w-sm flex flex-col gap-8">
+          {/* Bouton retour */}
+          <button
+            onClick={() => router.push('/profil')}
+            className="flex items-center gap-2 mb-2 text-black font-medium text-base hover:text-blue-600 focus:text-blue-600 transition-colors self-start"
+            style={{ background: 'none', border: 'none', padding: 0, outline: 'none', boxShadow: 'none', cursor: 'pointer' }}
+          >
+            <FaArrowLeft className="text-lg" />
+            <span>Retour au profil</span>
+          </button>
+          {/* Langue */}
+          <div className="bg-white rounded-3xl shadow-xl p-7 transition hover:shadow-2xl border border-blue-100">
+            <div className="flex items-center gap-3 mb-5">
+              <FaGlobe className="text-sky-500 text-xl" />
+              <span className="text-xl font-bold text-black">Langue</span>
+            </div>
+            <div className="flex flex-col gap-3 items-center w-full">
+              {LANGUAGES.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => handleLangChange(l.code)}
+                  className={`px-6 py-2 rounded-xl font-medium transition border text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-300 min-w-[130px] w-auto text-center
+                  ${
+                    lang === l.code
+                      ? 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white border-transparent opacity-80'
+                      : 'bg-gray-100 border-gray-300 text-gray-700 hover:bg-sky-50 hover:scale-105'
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Confidentialité */}
+          <div className="bg-white rounded-3xl shadow-xl p-7 transition hover:shadow-2xl border border-indigo-100">
+            <div className="flex items-center gap-3 mb-5">
+              <FaUserShield className="text-sky-500 text-xl" />
+              <span className="text-xl font-bold text-black">Confidentialité du compte</span>
+            </div>
+            <div className="flex justify-center w-full">
               <button
-                key={l.code}
-                className={`py-2 px-4 rounded border ${lang === l.code ? 'bg-green-100 border-green-400 text-green-700' : 'bg-gray-100 border-gray-300 text-gray-700'}`}
-                onClick={() => handleLangChange(l.code)}
+                onClick={handlePrivacyChange}
+                disabled={loadingPrivacy}
+                className={`px-6 py-2 rounded-xl font-semibold transition text-base border shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 min-w-[160px] w-auto text-center
+                  ${isPrivate
+                    ? 'bg-gray-100 border-gray-300 text-red-700 hover:bg-sky-50 hover:scale-105'
+                    : 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white border-transparent opacity-80'}`}
               >
-                {l.label}
+                {isPrivate
+                  ? 'Compte privé'
+                  : 'Compte public'}
               </button>
-            ))}
+            </div>
+            {privacyMsg && <p className="text-xs text-gray-500 mt-3">{privacyMsg}</p>}
+          </div>
+
+          {/* Dark Mode */}
+          <div className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200">
+            <FaMoon className="text-gray-500 text-xl" />
+            <span className="text-xl font-bold text-black">Mode sombre</span>
+          </div>
+
+          {/* Déconnexion */}
+          <div className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200">
+            <FaSignOutAlt className="text-red-500 text-xl" />
+            <span className="text-xl font-bold text-black-600">Déconnexion</span>
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow p-4 flex flex-col gap-2">
-          <span className="block font-semibold mb-2">Confidentialité du compte</span>
-          <button
-            onClick={handlePrivacyChange}
-            disabled={loadingPrivacy}
-            className={`py-2 px-4 rounded border font-semibold ${isPrivate ? 'bg-red-100 border-red-400 text-red-700' : 'bg-green-100 border-green-400 text-green-700'}`}
-          >
-            {isPrivate ? 'Compte privé (cliquer pour rendre public)' : 'Compte public (cliquer pour rendre privé)'}
-          </button>
-          {privacyMsg && <span className="text-xs text-gray-500 mt-1">{privacyMsg}</span>}
-        </div>
-        <button className="bg-white rounded-lg shadow p-4 text-gray-700 font-semibold border border-gray-200">Dark Mode</button>
-        <button className="bg-white rounded-lg shadow p-4 text-gray-700 font-semibold border border-gray-200">Déconnexion</button>
       </div>
     </div>
   );

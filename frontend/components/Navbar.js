@@ -10,7 +10,7 @@ const archivoBlack = Archivo_Black({
 export default function Navbar({ title }) {
   return (
     <header>
-      <nav className="max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20">
+      <nav className="fixed top-0 left-0 w-full z-50 max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20">
       <div 
         className=" w-12 h-12 absolute left-8"
         style={{
