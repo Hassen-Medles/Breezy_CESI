@@ -1,5 +1,4 @@
-import mongoose from 'mongoose';
-import bcrypt from 'bcryptjs';
+import mongoose from "mongoose";
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: false, unique: true },
@@ -8,10 +7,7 @@ const userSchema = new mongoose.Schema({
   verificationCode: { type: String },      // Code à 6 chiffres envoyé par email
   isVerified: { type: Boolean, default: false }, // Statut de vérification
   description: { type: String },
-  profilePicture: { type: String },
-  isPrivate: { type: Boolean, default: true }, // Compte privé par défaut
-  role: { type: String, enum: ['user', 'admin'], default: 'user' }, // Rôle de l'utilisateur
+  profilePicture: { type: String }
 });
 
-const User = mongoose.model('User', userSchema);
-export default User;
+export default mongoose.model("User", userSchema);

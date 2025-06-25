@@ -10,7 +10,7 @@ export default function PostForm({ onPostCreated }) {
     setError("");
     setLoading(true);
     try {
-      const res = await fetch("/api/posts", {
+      const res = await fetch("http://localhost:5001/api/posts", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

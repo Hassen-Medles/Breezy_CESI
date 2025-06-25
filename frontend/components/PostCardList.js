@@ -23,7 +23,7 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
     setLoading(true);
     setError("");
     try {
-      const res = await fetch(`/api/posts/${post._id}`, {
+      const res = await fetch(`http://localhost:5001/api/posts/${post._id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -47,7 +47,7 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   // Ajout d'un commentaire
   const handleAddComment = async (postId, content, parent = null) => {
     try {
-      const res = await fetch(`/api/comments/${postId}`, {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -72,7 +72,7 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   useEffect(() => {
     const fetchLikes = async () => {
       try {
-        const res = await fetch(`/api/posts/${post._id}/likes`, { credentials: 'include' });
+        const res = await fetch(`http://localhost:5001/api/posts/${post._id}/likes`, { credentials: 'include' });
         if (res.ok) {
           const data = await res.json();
           setLikeCount(data.count);
@@ -88,7 +88,7 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
     setLikeLoading(true);
     try {
       const method = liked ? 'DELETE' : 'POST';
-      const res = await fetch(`/api/posts/${post._id}/like`, {
+      const res = await fetch(`http://localhost:5001/api/posts/${post._id}/like`, {
         method,
         credentials: 'include',
       });
@@ -210,7 +210,7 @@ export default function PostCardList({ userId }) {
   const fetchComments = async (postId) => {
     setLoadingComments(true);
     try {
-      const res = await fetch(`/api/comments/post/${postId}`);
+      const res = await fetch(`http://localhost:5001/api/comments/post/${postId}`);
       const data = await res.json();
       setComments(prev => ({
         ...prev,
@@ -237,7 +237,7 @@ export default function PostCardList({ userId }) {
 
   const handleAddComment = async (postId, content, parent = null) => {
     try {
-      const res = await fetch(`/api/comments/${postId}`, {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -268,7 +268,7 @@ export default function PostCardList({ userId }) {
       return;
     }
     try {
-      const res = await fetch(`/api/posts/user/${userId}`, {
+      const res = await fetch(`http://localhost:5001/api/posts/user/${userId}`, {
         headers: {
           'Content-Type': 'application/json'
         },
@@ -288,7 +288,7 @@ export default function PostCardList({ userId }) {
         await Promise.all(
           data.map(async post => {
             try {
-              const res = await fetch(`/api/comments/post/${post._id}`);
+              const res = await fetch(`http://localhost:5001/api/comments/post/${post._id}`);
               const comments = await res.json();
               counts[post._id] = Array.isArray(comments) ? comments.length : 0;
             } catch {

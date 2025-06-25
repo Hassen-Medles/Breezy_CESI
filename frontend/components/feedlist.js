@@ -18,7 +18,7 @@ const FeedList = forwardRef((props, ref) => {
     await Promise.all(
       posts.map(async (post) => {
         try {
-          const res = await fetch(`/api/posts/${post._id}/likes`, { credentials: 'include' });
+          const res = await fetch(`http://localhost:5001/api/posts/${post._id}/likes`, { credentials: 'include' });
           const data = await res.json();
           counts[post._id] = data.count || 0;
           liked[post._id] = !!data.liked;
@@ -35,7 +35,7 @@ const FeedList = forwardRef((props, ref) => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/posts");
+      const res = await fetch("http://localhost:5001/api/posts");
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
       if (Array.isArray(data)) {
@@ -43,7 +43,7 @@ const FeedList = forwardRef((props, ref) => {
         await Promise.all(
           data.map(async post => {
             try {
-              const res = await fetch(`/api/comments/post/${post._id}`);
+              const res = await fetch(`http://localhost:5001/api/comments/post/${post._id}`);
               const comments = await res.json();
               counts[post._id] = Array.isArray(comments) ? comments.length : 0;
             } catch {
@@ -65,7 +65,7 @@ const FeedList = forwardRef((props, ref) => {
   const fetchComments = async (postId) => {
     setLoadingComments(true);
     try {
-      const res = await fetch(`/api/comments/post/${postId}`);
+      const res = await fetch(`http://localhost:5001/api/comments/post/${postId}`);
       const data = await res.json();
       setComments(prev => ({
         ...prev,
@@ -94,7 +94,7 @@ const FeedList = forwardRef((props, ref) => {
   // Ajout d'un commentaire
   const handleAddComment = async (postId, content, parent = null) => {
     try {
-      const res = await fetch(`/api/comments/${postId}`, {
+      const res = await fetch(`http://localhost:5001/api/comments/${postId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -119,7 +119,7 @@ const FeedList = forwardRef((props, ref) => {
   const handleLike = async (postId) => {
     const alreadyLiked = likedPosts[postId];
     try {
-      const url = `/api/posts/${postId}/like`;
+      const url = `http://localhost:5001/api/posts/${postId}/like`;
       const method = alreadyLiked ? 'DELETE' : 'POST';
       const res = await fetch(url, { method, credentials: 'include' });
       if (!res.ok) throw new Error('Erreur lors du like');
