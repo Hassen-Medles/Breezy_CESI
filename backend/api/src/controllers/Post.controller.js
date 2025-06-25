@@ -1,5 +1,22 @@
 import Post from '../models/Post.js';
 import Like from '../models/Like.js';
+import Follow from "../models/Follow.js";
+
+export async function getFollowedPosts(req, res) {
+  try {
+    const userId = req.user._id || req.user.id || req.user.userId;
+    // Récupère les IDs des utilisateurs suivis
+    const follows = await Follow.find({ follower: userId }).select("followed");
+    const followedIds = follows.map(f => f.followed);
+    // Récupère les posts des utilisateurs suivis
+    const posts = await Post.find({ author: { $in: followedIds } })
+      .populate("author", "username profilePicture")
+      .sort({ createdAt: -1 });
+    res.json(posts);
+  } catch (err) {
+    res.status(500).json({ message: "Erreur lors de la récupération du feed." });
+  }
+}
 
 export async function createPost(req, res) {
   try {
