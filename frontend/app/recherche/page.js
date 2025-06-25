@@ -124,7 +124,7 @@ export default function Recherche() {
               <div className="flex items-center mb-2">
                 <div className="w-10 h-10 rounded-full bg-gray-200 mr-3" />
                 <div>
-                  <div className="font-semibold">{post.author?.name || "Name"}</div>
+                  <div className="font-semibold">{post.author?.username || post.author?.name || "Utilisateur"}</div>
                   <div className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {new Date(post.createdAt).toLocaleDateString()}</div>
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function Recherche() {
                 <div className="bg-gray-100 rounded p-2 mb-2">
                   {post.comments.map((c, i) => (
                     <div key={i} className="mb-1">
-                      <span className="font-semibold text-sm">{c.author?.name || "Name"}</span>
+                      <span className="font-semibold text-sm">{c.author?.username || c.author?.name || "<Deleted User>"}</span>
                       <span className="ml-2 text-gray-700 text-sm">{c.content}</span>
                     </div>
                   ))}
