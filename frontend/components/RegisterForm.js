@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import Navbar from "../components/Navbar";
+import Link from "next/link";
 
 export default function RegisterForm() {
   const router = useRouter();
@@ -149,6 +149,12 @@ export default function RegisterForm() {
           >
             Créer un compte
           </button>
+          <div className="text-center text-sm text-gray-600 mt-4">
+            Pas de compte ?{" "}
+            <Link href="/register" className="text-sky-500 font-medium hover:underline">
+              Créer un compte
+            </Link>
+          </div>
         </form>
       </div>
       {showCodeModal && (

@@ -106,9 +106,13 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
       <div className="flex items-center mb-2">
         {post.author?.profilePicture ? (
           <img
-            src={post.author.profilePicture}
+            src={post.author.profilePicture.startsWith('http') ? post.author.profilePicture : `http://localhost:5000/uploads/${post.author.profilePicture}`}
             alt="Profil"
             className="w-8 h-8 rounded-full object-cover mr-3"
+            onError={e => {
+              e.target.onerror = null;
+              e.target.src = '/defaultimage.png';
+            }}
           />
         ) : (
           <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
@@ -197,7 +201,7 @@ function PostCard({ post, onPostUpdated, onOpenComments, openCommentPostId, comm
   );
 }
 
-export default function PostCardList({ userId }) {
+export default function PostCardList({ userId, onCountChange }) {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
@@ -310,14 +314,14 @@ export default function PostCardList({ userId }) {
     fetchPosts();
   }, [userId]);
 
+  useEffect(() => {
+    if (onCountChange) onCountChange(posts.length);
+  }, [posts.length, onCountChange]);
+
   const postsToShow = showAll ? posts : posts.slice(0, 3);
 
   return (
     <div className="bg-gray-100 rounded-xl p-4">
-      <div className="flex items-center mb-4">
-        <span className="font-bold text-lg">Vos messages</span>
-        <span className="ml-4 text-gray-400 text-lg">{posts.length} publications</span>
-      </div>
       {loading ? (
         <div>Chargement...</div>
       ) : apiError ? (
@@ -341,7 +345,7 @@ export default function PostCardList({ userId }) {
           ))}
           {posts.length > 3 && !showAll && (
             <button
-              className="w-full mt-2 py-2 bg-white rounded shadow text-gray-700 font-semibold hover:bg-gray-200 transition"
+              className="w-full mt-2 py-2 rounded shadow text-white font-semibold bg-gradient-to-r from-sky-500 to-indigo-500 hover:brightness-110 transition"
               onClick={() => setShowAll(true)}
             >
               Voir plus
@@ -349,7 +353,7 @@ export default function PostCardList({ userId }) {
           )}
           {showAll && posts.length > 3 && (
             <button
-              className="w-full mt-2 py-2 bg-white rounded shadow text-gray-700 font-semibold hover:bg-gray-200 transition"
+              className="w-full mt-2 py-2 rounded shadow text-white font-semibold bg-gradient-to-r from-sky-500 to-indigo-500 hover:brightness-110 transition"
               onClick={() => setShowAll(false)}
             >
               Voir moins

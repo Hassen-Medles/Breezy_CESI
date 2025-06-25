@@ -5,6 +5,7 @@ export default function RegisterProfil() {
   return (
     <main>
       <Navbar title="INSCRIPTION" />
+      <div className="h-20" />
       <RegisterProfilForm />
     </main>
   );

@@ -60,6 +60,7 @@ export default function ProfilUserPage() {
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <Navbar title="PROFIL" />
+      <div className="h-20" />
       <div className="mb-4">
         <button
           onClick={() => router.push('/recherche')}

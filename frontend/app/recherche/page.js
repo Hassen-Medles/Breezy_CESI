@@ -71,6 +71,7 @@ export default function Recherche() {
   return (
     <div className="bg-gray-50 min-h-screen pb-20">
       <Navbar title="RECHERCHE"/>
+      <div className="h-20" />
       <div className="relative flex items-center bg-white rounded-full shadow px-4 py-2 mx-2 mt-4 mb-4">
         <input
           type="text"

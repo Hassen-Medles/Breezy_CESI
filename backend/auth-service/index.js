@@ -21,6 +21,7 @@ app.use(express.json());
 mongoose.connect(process.env.MONGO_URI, {});
 
 app.use(cookieParser());
+app.use("/uploads", express.static("uploads"));
 // Monte les routes d'authentification APRÈS la config d'app
 authRoutes(app);
 
