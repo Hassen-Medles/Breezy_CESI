@@ -3,7 +3,7 @@ import Navbar from "../../components/Navbar";
 
 export default function RegisterPage() {
   return (
-    <main>
+    <main className="no-scrollbar">
       <Navbar title="INSCRIPTION" />
       <RegisterForm />
     </main>

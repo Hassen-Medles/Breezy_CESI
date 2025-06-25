@@ -37,7 +37,7 @@ export default function LoginForm() {
   return (
     <>
       <Navbar title="CONNEXION" />
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50 no-scrollbar">
         <form
           onSubmit={handleSubmit}
           className="bg-white rounded-3xl shadow-lg px-10 py-10 w-full max-w-lg flex flex-col gap-6"
