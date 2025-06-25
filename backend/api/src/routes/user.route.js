@@ -106,4 +106,9 @@ router.get("/:id/follow-counts", async (req, res) => {
   }
 });
 
+router.post("/logout", (req, res) => {
+  res.clearCookie("token", { path: "/", httpOnly: true, sameSite: "lax" });
+  res.status(200).json({ message: "Déconnecté" });
+});
+
 export default router;

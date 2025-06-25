@@ -12,21 +12,21 @@ const archivoBlack = Archivo_Black({
 export default function Navbar({ title }) {
   return (
     <header>
-      <nav className="fixed top-0 left-0 w-full z-50 max-w-7xl mx-auto flex items-center h-20 relative">
-        <div 
-          className="w-12 h-12 absolute left-8"
-          style={{
-            WebkitMaskImage: "url(/wind-solid.svg)",
-            maskImage: "url(/wind-solid.svg)",
-            WebkitMaskRepeat: "no-repeat",
-            maskRepeat: "no-repeat",
-            WebkitMaskSize: "contain",
-            maskSize: "contain",
-            background: "linear-gradient(90deg, #00AEEF 25%, #12F146 69%)",
-            backgroundClip: "border-box",
-            display: "inline-block",
-          }}
-        />
+      <nav className="fixed top-0 left-0 w-full z-50 max-w-7xl mx-auto flex items-center justify-center space-x-3 h-20 bg-white bg-opacity-95 backdrop-blur-md shadow-md border-b border-gray-200">
+      <div 
+        className=" w-12 h-12 absolute left-8"
+        style={{
+          WebkitMaskImage: "url(/wind-solid.svg)",
+          maskImage: "url(/wind-solid.svg)",
+          WebkitMaskRepeat: "no-repeat",
+          maskRepeat: "no-repeat",
+          WebkitMaskSize: "contain",
+          maskSize: "contain",
+          background: "linear-gradient(90deg, #00AEEF 25%, #12F146 69%)",
+          backgroundClip: "border-box",
+          display: "inline-block",
+        }}
+      />
 
         {/* Texte multicolore */}
         <h1 className="text-2xl font-extrabold flex mx-auto">

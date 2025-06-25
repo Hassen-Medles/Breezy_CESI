@@ -11,7 +11,7 @@ const LANGUAGES = [
 
 export default function ParametresPage() {
   const [lang, setLang] = useState(() => typeof window !== "undefined" ? localStorage.getItem("lang") || "fr" : "fr");
-  const [isPrivate, setIsPrivate] = useState(true);
+  const [isPrivate, setIsPrivate] = useState(null); // null = loading
   const [loadingPrivacy, setLoadingPrivacy] = useState(false);
   const [privacyMsg, setPrivacyMsg] = useState("");
   const router = useRouter();
@@ -104,18 +104,27 @@ export default function ParametresPage() {
               <span className="text-xl font-bold text-black">Confidentialité du compte</span>
             </div>
             <div className="flex justify-center w-full">
-              <button
-                onClick={handlePrivacyChange}
-                disabled={loadingPrivacy}
-                className={`px-6 py-2 rounded-xl font-semibold transition text-base border shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 min-w-[160px] w-auto text-center
-                  ${isPrivate
-                    ? 'bg-gray-100 border-gray-300 text-red-700 hover:bg-sky-50 hover:scale-105'
-                    : 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white border-transparent opacity-80'}`}
-              >
-                {isPrivate
-                  ? 'Compte privé'
-                  : 'Compte public'}
-              </button>
+              {isPrivate === null ? (
+                <button
+                  className="px-6 py-2 rounded-xl font-semibold transition text-base border shadow-sm min-w-[160px] w-auto text-center bg-gray-100 border-gray-300 text-gray-400 cursor-not-allowed animate-pulse"
+                  disabled
+                >
+                  Chargement...
+                </button>
+              ) : (
+                <button
+                  onClick={handlePrivacyChange}
+                  disabled={loadingPrivacy}
+                  className={`px-6 py-2 rounded-xl font-semibold transition text-base border shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 min-w-[160px] w-auto text-center
+                    ${isPrivate
+                      ? 'bg-gray-100 border-gray-300 text-red-700 hover:bg-sky-50 hover:scale-105'
+                      : 'bg-gradient-to-r from-sky-500 to-indigo-500 text-white border-transparent opacity-80'}`}
+                >
+                  {isPrivate
+                    ? 'Compte privé'
+                    : 'Compte public'}
+                </button>
+              )}
             </div>
             {privacyMsg && <p className="text-xs text-gray-500 mt-3">{privacyMsg}</p>}
           </div>
@@ -127,10 +136,20 @@ export default function ParametresPage() {
           </div>
 
           {/* Déconnexion */}
-          <div className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200">
+          <button
+            onClick={async () => {
+              try {
+                await fetch("/api/user/logout", { method: "POST", credentials: "include" });
+                await fetch("/auth/logout", { method: "POST", credentials: "include" });
+              } catch (e) {
+              }
+              router.push("/");
+            }}
+            className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200 w-full"
+          >
             <FaSignOutAlt className="text-red-500 text-xl" />
             <span className="text-xl font-bold text-black-600">Déconnexion</span>
-          </div>
+          </button>
         </div>
       </div>
     </div>
