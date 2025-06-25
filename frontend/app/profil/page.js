@@ -110,12 +110,20 @@ export default function ProfilPage() {
           >
             {user ? user.description : "Description"}
           </p>
-          <button
-            className="mt-5 bg-gradient-to-r from-sky-500 to-indigo-500 text-white py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-gray-300"
-            onClick={() => window.location.href = '/parametres'}
-          >
-            Paramètres
-          </button>
+          <div className="flex gap-2 mt-5">
+            <button
+              className="bg-gradient-to-r from-sky-500 to-indigo-500 text-white py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-gray-300"
+              onClick={() => window.location.href = '/parametres'}
+            >
+              Paramètres
+            </button>
+            <button
+              className="bg-white border border-sky-500 text-sky-500 py-1 md:py-2 px-3 md:px-6 rounded-xl text-xs md:text-base font-semibold hover:bg-sky-50 transition"
+              onClick={() => window.location.href = '/modifier'}
+            >
+              Modifier
+            </button>
+          </div>
         </div>
 
         {/* Vos messages titre hors du cadre gris */}
