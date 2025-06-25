@@ -44,7 +44,7 @@ export default function Notifications() {
     <div className="min-h-screen bg-gray-50 pb-20">
       <Navbar title="NOTIFICATIONS" />
       <div className="h-20" />
-      <div className="max-w-md mx-auto mt-6">
+      <div className="max-w-sm w-full mx-auto mt-6">
         <span className="block font-semibold text-lg mb-2">Demande d’amis</span>
         {requests.length === 0 && <div className="text-gray-400">Aucune demande</div>}
         {requests.length > 0 && (
@@ -61,17 +61,36 @@ export default function Notifications() {
             {(expanded || requests.length <= 3) && (
               <div>
                 {requests.map((req, i) => (
-                  <div key={req._id} className="flex items-center gap-3 bg-white rounded-lg shadow p-3 mb-2">
-                    <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center text-2xl">
-                      {req.from?.profilePicture ? (
-                        <img src={req.from.profilePicture} alt={req.from.username} className="w-full h-full rounded-full object-cover" />
-                      ) : (
-                        <span>+</span>
-                      )}
+                  <div key={req._id} className="flex items-center gap-3 bg-white rounded-2xl shadow p-3 mb-2 border border-gray-100 w-full">
+                    <div className="flex-shrink-0 w-12 h-12 md:w-16 md:h-16">
+                      <div className="w-full h-full bg-white rounded-full flex items-center justify-center overflow-hidden">
+                        {req.from && req.from.profilePicture ? (
+                          <img
+                            src={req.from.profilePicture.startsWith('http') ? req.from.profilePicture : `http://localhost:5000/uploads/${req.from.profilePicture}`}
+                            alt="Photo de profil"
+                            className="w-full h-full object-cover rounded-full"
+                            onError={e => {
+                              e.target.onerror = null;
+                              e.target.src = '/defaultimage.png';
+                              e.target.className = 'w-full h-full object-cover rounded-full';
+                            }}
+                          />
+                        ) : (
+                          <span className="text-2xl text-sky-300"><svg width="32" height="32" fill="currentColor"><circle cx="16" cy="16" r="16" /></svg></span>
+                        )}
+                      </div>
                     </div>
                     <span className="font-medium">{req.from?.username || 'Name'}</span>
-                    <button className="ml-auto text-blue-500 text-2xl" onClick={() => handleAccept(req._id)}>✔️</button>
-                    <button className="text-black text-2xl" onClick={() => handleDecline(req._id)}>✖️</button>
+                    <button className="ml-auto p-2 rounded-full hover:bg-sky-100 transition" onClick={() => handleAccept(req._id)} title="Accepter">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="#0ea5e9" strokeWidth="3">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </button>
+                    <button className="p-2 rounded-full hover:bg-gray-100 transition" onClick={() => handleDecline(req._id)} title="Refuser">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="#6b7280" strokeWidth="3">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
                   </div>
                 ))}
                 {requests.length > 3 && expanded && (
