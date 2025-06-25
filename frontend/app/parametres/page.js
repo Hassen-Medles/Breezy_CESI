@@ -127,10 +127,20 @@ export default function ParametresPage() {
           </div>
 
           {/* Déconnexion */}
-          <div className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200">
+          <button
+            onClick={async () => {
+              try {
+                await fetch("/api/user/logout", { method: "POST", credentials: "include" });
+                await fetch("/auth/logout", { method: "POST", credentials: "include" });
+              } catch (e) {
+              }
+              router.push("/");
+            }}
+            className="flex items-center gap-3 mb-5 bg-white rounded-3xl shadow-xl p-5 border border-gray-200 w-full"
+          >
             <FaSignOutAlt className="text-red-500 text-xl" />
             <span className="text-xl font-bold text-black-600">Déconnexion</span>
-          </div>
+          </button>
         </div>
       </div>
     </div>

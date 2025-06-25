@@ -150,9 +150,9 @@ export default function RegisterForm() {
             Créer un compte
           </button>
           <div className="text-center text-sm text-gray-600 mt-4">
-            Pas de compte ?{" "}
-            <Link href="/register" className="text-sky-500 font-medium hover:underline">
-              Créer un compte
+            Déjà un compte ?{" "}
+            <Link href="/" className="text-sky-500 font-medium hover:underline">
+              Connexion
             </Link>
           </div>
         </form>

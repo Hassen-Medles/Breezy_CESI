@@ -41,11 +41,6 @@ export default function(app) {
     });
     app.get("/profile", authenticateToken, authController.getProfile);
     app.post("/notification", authenticateToken, async (req, res) => {
-        // Exemple : créer une notification (à adapter selon ton modèle)
-        // const { type, message } = req.body;
-        // const notification = new Notification({ type, user: req.user._id, message });
-        // await notification.save();
-        // res.status(201).json(notification);
         res.status(201).json({ message: "Notification POST OK (à implémenter selon besoin)" });
     });
     app.get("/notification", authenticateToken, (req, res) => {
@@ -56,6 +51,12 @@ export default function(app) {
     });
     app.get("/recherche", authenticateToken, (req, res) => {
         res.json({ message: "Recherche GET OK" });
+    });
+
+    // Route logout pour supprimer le cookie httpOnly côté auth-service
+    app.post("/logout", (req, res) => {
+        res.clearCookie("token", { path: "/", httpOnly: true, sameSite: "lax" });
+        res.status(200).json({ message: "Déconnecté" });
     });
 
     app.use('/uploads', express.static('uploads', {

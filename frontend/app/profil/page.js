@@ -55,7 +55,7 @@ export default function ProfilPage() {
     <div className="min-h-screen flex flex-col">
       <Navbar title="PROFIL" />
       <div className="h-20" />
-      <main className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-xl px-8 py-10 mt-8 space-y-10">
+      <main className="w-full max-w-5xl mx-auto bg-white rounded-3xl shadow-xl px-8 py-10 space-y-10">
         {/* Section Profil en ligne */}
         <div className="flex flex-col-reverse md:flex-row items-center md:items-start md:space-x-10 space-y-4 md:space-y-0">
           {/* Infos utilisateur à gauche (ou en haut sur mobile) */}
