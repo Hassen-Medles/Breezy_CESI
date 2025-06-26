@@ -20,6 +20,9 @@ export default function Conversation() {
   const fileCameraInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
+  // Récupère l'URL du backend depuis la variable d'environnement (définie dans .env.local ou docker)
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+
   useEffect(() => {
     const fetchConversation = async () => {
       const res = await fetch(`/api/conversations/${id}`, { credentials: "include" });
@@ -180,39 +183,69 @@ export default function Conversation() {
   return (
     <>
       <Navbar title="CONVERSATION" />
-      <ConversationsHeader name={conversation?.otherUser?.username || "Utilisateur"} profilePicture={conversation?.otherUser?.profilePicture} />
-      {/* Ajout d'un margin-bottom pour ne pas cacher les messages par l'input */}
+      {/* Header sticky juste sous la navbar */}
       <div
-        className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50 mt-8"
-        style={{ minHeight: "80vh", marginBottom: "110px" }}
+        className="w-full bg-white border-b border-gray-100 z-40"
+        style={{ position: 'sticky', top: 80, minHeight: 60 }} 
       >
-        {messages.map(msg =>
-          msg.sender === conversation?.me ? (
-            <div key={msg._id} className="flex flex-col items-end mb-2">
-              <MessageSent content={msg.content} />
-              {msg.image && (
-                <img
-                  src={`http://localhost:5001/uploads/${msg.image}`}
-                  alt="Image envoyée"
-                  style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
-                  className="self-end"
+        <ConversationsHeader
+          name={conversation?.otherUser?.username || (conversation ? "Utilisateur" : "...")}
+          profilePicture={conversation?.otherUser?.profilePicture}
+          isOnline={conversation?.otherUser?.isOnline}
+        />
+      </div>
+      {/* Zone messages avec padding top pour ne pas passer sous le header sticky */}
+      <div
+        className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50"
+        style={{ minHeight: "80vh", marginBottom: "110px", paddingTop: 110 }}
+      >
+        {messages.map(msg => {
+          // Correction : msg.sender peut être un objet (populate) ou un id (string)
+          const senderId = (msg.sender && typeof msg.sender === 'object' && msg.sender._id) ? msg.sender._id.toString() : msg.sender?.toString?.() || msg.sender;
+          const isMe = senderId === conversation?.me;
+          if (isMe) {
+            return (
+              <div key={msg._id} className="flex flex-col items-end mb-2">
+                <MessageSent content={msg.content} />
+                {msg.image && (
+                  <img
+                    src={`${API_URL}/uploads/${msg.image}`}
+                    alt="Image envoyée"
+                    style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
+                    className="self-end"
+                  />
+                )}
+              </div>
+            );
+          } else {
+            // Affiche l'avatar uniquement pour les messages reçus
+            let profilePicture = null;
+            if (msg.sender && typeof msg.sender === 'object' && msg.sender.profilePicture) {
+              profilePicture = msg.sender.profilePicture;
+            } else if (msg.senderProfilePicture) {
+              profilePicture = msg.senderProfilePicture;
+            } else if (conversation?.otherUser?.profilePicture) {
+              profilePicture = conversation.otherUser.profilePicture;
+            }
+            // Passe la valeur brute à MessageRecieved (nom ou chemin)
+            return (
+              <div key={msg._id} className="flex flex-col items-start mb-2">
+                <MessageRecieved 
+                  content={msg.content} 
+                  profilePicture={profilePicture}
                 />
-              )}
-            </div>
-          ) : (
-            <div key={msg._id} className="flex flex-col items-start mb-2">
-              <MessageRecieved content={msg.content} profilePicture={conversation?.otherUser?.profilePicture} />
-              {msg.image && (
-                <img
-                  src={`http://localhost:5001/uploads/${msg.image}`}
-                  alt="Image envoyée"
-                  style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
-                  className="self-start"
-                />
-              )}
-            </div>
-          )
-        )}
+                {msg.image && (
+                  <img
+                    src={`${API_URL}/uploads/${msg.image}`}
+                    alt="Image envoyée"
+                    style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
+                    className="self-start"
+                  />
+                )}
+              </div>
+            );
+          }
+        })}
         <div ref={messagesEndRef} />
       </div>
       {/* Barre d'envoi de message */}

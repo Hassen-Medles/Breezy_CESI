@@ -42,7 +42,9 @@ router.get("/:id", auth, async (req, res) => {
     const conversation = await Conversation.findById(req.params.id).populate('participants', 'username profilePicture');
     if (!conversation) return res.status(404).json({ message: "Conversation non trouvée" });
 
-    const messages = await Message.find({ conversation: conversation._id }).sort({ createdAt: 1 });
+    const messages = await Message.find({ conversation: conversation._id })
+      .sort({ createdAt: 1 })
+      .populate('sender', 'username profilePicture'); // Ajout du populate pour le sender
     // Optionnel : déterminer l'autre utilisateur
     const me = req.user.userId;
     const otherUser = conversation.participants.find(
@@ -55,7 +57,11 @@ router.get("/:id", auth, async (req, res) => {
         me,
         otherUser
       },
-      messages
+      messages: messages.map(msg => ({
+        ...msg.toObject(),
+        senderProfilePicture: msg.sender?.profilePicture || null,
+        senderUsername: msg.sender?.username || null
+      }))
     });
   } catch (err) {
     console.error(err);
