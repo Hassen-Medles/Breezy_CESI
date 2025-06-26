@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { resolveContent } from "nodemailer/lib/shared";
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: false, unique: true },
@@ -7,7 +8,8 @@ const userSchema = new mongoose.Schema({
   verificationCode: { type: String },      // Code à 6 chiffres envoyé par email
   isVerified: { type: Boolean, default: false }, // Statut de vérification
   description: { type: String },
-  profilePicture: { type: String }
+  profilePicture: { type: String },
+  roles: { type: [String], default: ["user"], enum: ["user", "moderator", "administrator"] }
 });
 
 export default mongoose.model("User", userSchema);

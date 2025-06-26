@@ -9,7 +9,8 @@ const userSchema = new mongoose.Schema({
   isVerified: { type: Boolean, default: false }, // Statut de vérification
   description: { type: String },
   profilePicture: { type: String },
-  isPrivate: { type: Boolean, default: true } // Compte privé par défaut
+  isPrivate: { type: Boolean, default: true }, // Compte privé par défaut
+  roles: { type: [String], default: ["user"], enum: ["user", "moderator", "administrator"] }, // Seuls ces rôles sont autorisés
 });
 
 const User = mongoose.model('User', userSchema);
