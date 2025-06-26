@@ -57,7 +57,7 @@ export default function Accueil() {
       <div className="h-20" />
       <div className="pb-24">
         <PostForm onPostCreated={handlePostCreated} />
-        <FeedList ref={feedListRef} />
+        <FeedList ref={feedListRef} user={user} followingOnly />
       </div>
     </>
   );

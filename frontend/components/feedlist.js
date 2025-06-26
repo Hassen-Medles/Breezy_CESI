@@ -12,7 +12,6 @@ const REPORT_REASONS = [
 ];
 
 const FeedList = forwardRef((props, ref) => {
-  const { publicOnly, userId } = props;
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
@@ -21,7 +20,11 @@ const FeedList = forwardRef((props, ref) => {
   const [commentCounts, setCommentCounts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [likedPosts, setLikedPosts] = useState({});
-  const [user, setUser] = useState(null);
+  const [userState, setUser] = useState(null);
+  // On utilise la prop user si fournie, sinon l'état local userState
+  const userFromProps = props.user;
+  const user = userFromProps || userState;
+  const { publicOnly, userId, followingOnly } = props;
   const [reportModal, setReportModal] = useState({ open: false, postId: null });
   const [selectedReason, setSelectedReason] = useState(REPORT_REASONS[0]);
   const [reportLoading, setReportLoading] = useState(false);
@@ -82,6 +85,11 @@ const FeedList = forwardRef((props, ref) => {
       }
       if (userId) {
         data = Array.isArray(data) ? data.filter(post => post.author && post.author._id === userId) : [];
+      }
+      // Filtrage : n'afficher que les posts des personnes suivies
+      if (followingOnly && user && user.following) {
+        const followingIds = user.following.map(f => f._id || f);
+        data = Array.isArray(data) ? data.filter(post => post.author && followingIds.includes(post.author._id)) : [];
       }
       setPosts(Array.isArray(data) ? data : []);
       if (props.onPostsChange) props.onPostsChange(Array.isArray(data) ? data : []);

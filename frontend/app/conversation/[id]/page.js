@@ -167,8 +167,13 @@ export default function Conversation() {
   return (
     <>
       <Navbar title="CONVERSATION" />
-      <ConversationsHeader name={conversation?.otherUser?.username || (conversation ? "Utilisateur" : "...")} />
-      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50" style={{ minHeight: "80vh" }}>
+      <div className="w-full bg-white border-b border-gray-100 z-40" style={{position: 'sticky', top: 80, minHeight: 60}}>
+        <ConversationsHeader 
+          name={conversation?.otherUser?.username || (conversation ? "Utilisateur" : "...")}
+          profilePicture={conversation?.otherUser?.profilePicture ? (conversation?.otherUser?.profilePicture.startsWith('http') ? conversation?.otherUser?.profilePicture : `http://localhost:5000/uploads/${conversation?.otherUser?.profilePicture}`) : undefined}
+        />
+      </div>
+      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50 pt-24" style={{ minHeight: "80vh" }}>
         {messages.map(msg =>
           msg.sender === conversation?.me ? (
             <MessageSent key={msg._id} content={msg.content} />

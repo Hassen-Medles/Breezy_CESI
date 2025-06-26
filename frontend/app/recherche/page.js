@@ -246,7 +246,7 @@ export default function Recherche() {
       </div>
       {/* Affichage des posts publics via FeedList */}
       <div className="px-2">
-        <FeedList publicOnly />
+        <FeedList publicOnly user={user} />
       </div>
     </div>
   );

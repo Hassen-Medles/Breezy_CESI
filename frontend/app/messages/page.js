@@ -77,6 +77,23 @@ export default function Messages() {
   return (
     <>
       <Navbar title="MESSAGES" />
+      <button onClick={() => router.push('/accueil')} className="absolute left-4 top-24 z-50 text-2xl text-sky-500 hover:text-sky-700 cursor-pointer transition-colors duration-200 bg-white rounded-full p-1 shadow">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          className="w-7 h-7"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+        >
+          <path
+            stroke="#0ea5e9"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+      </button>
       <div className="min-h-screen flex flex-col items-center justify-start bg-gray-50">
         <SearchBar />
         {/* Ajout d'un margin-top pour éviter la collision avec la navbar */}
