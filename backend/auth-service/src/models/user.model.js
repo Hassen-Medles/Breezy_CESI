@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-import { resolveContent } from "nodemailer/lib/shared";
+
 
 const userSchema = new mongoose.Schema({
   username: { type: String, required: false, unique: true },
