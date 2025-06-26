@@ -12,6 +12,7 @@ const REPORT_REASONS = [
 ];
 
 const FeedList = forwardRef((props, ref) => {
+  const { publicOnly, userId } = props;
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [openCommentPostId, setOpenCommentPostId] = useState(null);
@@ -47,13 +48,45 @@ const FeedList = forwardRef((props, ref) => {
     setLikedPosts(liked);
   };
 
+  // Récupère le nombre de commentaires pour chaque post
+  const fetchCommentCounts = async (posts) => {
+    const counts = {};
+    await Promise.all(
+      posts.map(async (post) => {
+        try {
+          const res = await fetch(`/api/comments/post/${post._id}`);
+          const data = await res.json();
+          counts[post._id] = Array.isArray(data) ? data.length : 0;
+        } catch {
+          counts[post._id] = 0;
+        }
+      })
+    );
+    setCommentCounts(counts);
+  };
+
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/feed/following", { credentials: "include" })
-      const data = await res.json();
+      let url = "/api/feed/following";
+      if (publicOnly) {
+        url = "/api/posts";
+      }
+      if (userId) {
+        url = `/api/user/${userId}/posts`;
+      }
+      const res = await fetch(url, { credentials: "include" });
+      let data = await res.json();
+      if (publicOnly) {
+        data = Array.isArray(data) ? data.filter(post => post.author && post.author.isPrivate === false) : [];
+      }
+      if (userId) {
+        data = Array.isArray(data) ? data.filter(post => post.author && post.author._id === userId) : [];
+      }
       setPosts(Array.isArray(data) ? data : []);
-      // ...reste du code pour charger les likes/commentaires...
+      // Ajout : charger les likes après avoir mis à jour les posts
+      await fetchLikes(Array.isArray(data) ? data : []);
+      await fetchCommentCounts(Array.isArray(data) ? data : []);
     } catch (err) {
       setPosts([]);
     } finally {
@@ -130,6 +163,10 @@ const FeedList = forwardRef((props, ref) => {
         } catch {}
         // Correction : on force la resynchro même en cas d’erreur pour éviter un état incohérent
         await fetchLikes(posts);
+        // Masquer les alertes inutiles
+        if (msg === 'Déjà liké.' || msg === 'Pas encore liké.') {
+          return;
+        }
         alert(msg);
         return;
       }
