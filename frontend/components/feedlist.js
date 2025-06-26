@@ -1,5 +1,6 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import CommentForm from "./CommentForm";
+import { FaHeart, FaRegComment, FaFlag } from "react-icons/fa";
 
 const REPORT_REASONS = [
   "Spam ou publicité",
@@ -121,10 +122,21 @@ const FeedList = forwardRef((props, ref) => {
       const url = `/api/posts/${postId}/like`;
       const method = alreadyLiked ? 'DELETE' : 'POST';
       const res = await fetch(url, { method, credentials: 'include' });
-      if (!res.ok) throw new Error('Erreur lors du like');
+      if (!res.ok) {
+        let msg = 'Erreur lors du like';
+        try {
+          const data = await res.json();
+          if (data && data.message) msg = data.message;
+        } catch {}
+        // Correction : on force la resynchro même en cas d’erreur pour éviter un état incohérent
+        await fetchLikes(posts);
+        alert(msg);
+        return;
+      }
       // Recharge les likes depuis le backend pour avoir le vrai total
       await fetchLikes(posts);
     } catch (err) {
+      await fetchLikes(posts); // Toujours resynchroniser
       alert(err.message);
     }
   };
@@ -186,8 +198,8 @@ const FeedList = forwardRef((props, ref) => {
       ) : (
         <>
           {posts.map((post) => (
-            <div key={post._id} className="bg-white border rounded-lg mb-3 p-4 shadow-sm mt-2">
-              <div className="flex items-center gap-2 mb-1">
+            <div key={post._id} className="bg-white rounded-lg shadow p-4 mb-4">
+              <div className="flex items-center mb-2">
                 {post.author?.profilePicture ? (
                   <img
                     src={
@@ -198,64 +210,66 @@ const FeedList = forwardRef((props, ref) => {
                           : '/defaultimage.png'
                     }
                     alt="Photo de profil"
-                    className="w-8 h-8 rounded-full mr-3 object-cover"
+                    className="w-10 h-10 rounded-full mr-3 object-cover"
                     onError={e => {
                       if (e.target.src.endsWith('/defaultimage.png')) return;
                       e.target.onerror = null;
                       e.target.src = '/defaultimage.png';
-                      e.target.className = 'w-8 h-8 object-cover rounded-full';
+                      e.target.className = 'w-10 h-10 object-cover rounded-full';
                     }}
                   />
                 ) : (
-                  <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
+                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3" />
                 )}
-                <span className="font-semibold text-base text-gray-700">{post.author?.username || post.authorName || "<deleted user>"}</span>
+                <div>
+                  <div className="font-semibold">{post.author?.username || post.authorName || "<deleted user>"}</div>
+                  <div className="text-xs text-gray-400">{post.createdAt && (new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' ' + new Date(post.createdAt).toLocaleDateString())}</div>
+                </div>
               </div>
-              <div className="text-base mb-2 text-gray-700">{post.content}</div>
-              <div className="flex items-center text-sm text-gray-400 gap-4">
-                <span>
-                  {post.createdAt && (new Date(post.createdAt).toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" }) + " " + new Date(post.createdAt).toLocaleDateString("fr-FR"))}
-                </span>
-                <button
-                  className={
-                    `ml-4 flex items-center gap-1 px-2 py-1 rounded-full border transition-all duration-200 ` +
-                    (likedPosts[post._id]
-                      ? 'bg-pink-100 border-pink-300 text-pink-600 shadow-sm scale-105'
-                      : 'bg-white border-gray-300 text-gray-400 hover:bg-pink-50 hover:text-pink-500')
-                  }
-                  title={likedPosts[post._id] ? "Je n'aime plus" : "J'aime"}
-                  style={{ cursor: "pointer", fontWeight: 600, fontSize: '1.1rem', minWidth: 36, position: 'relative', overflow: 'hidden' }}
-                  onClick={() => handleLike(post._id)}
-                >
-                  <span
+              <div className="mb-2 text-gray-800">{post.content}</div>
+              <div className="flex items-center justify-between mt-2">
+                <div className="flex items-center space-x-4">
+                  <button
                     className={
-                      'transition-all duration-200 ' +
-                      (likedPosts[post._id] ? 'heart-pop' : '')
+                      `flex items-center focus:outline-none`
                     }
-                    style={{ fontSize: '1.3rem', lineHeight: 1 }}
+                    title={likedPosts[post._id] ? "Je n'aime plus" : "J'aime"}
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
+                    onClick={() => handleLike(post._id)}
                   >
-                    {likedPosts[post._id] ? "❤️" : "🤍"}
-                  </span>
-                  <span className="font-semibold text-sm" style={{ minWidth: 18, textAlign: 'center' }}>{likeCounts[post._id] ?? 0}</span>
-                </button>
-                <button
-                  className="ml-4 text-gray-500 hover:text-blue-500"
-                  title="Afficher les commentaires"
-                  style={{ background: "none", border: "none", cursor: "pointer" }}
-                  onClick={() => handleOpenComments(post._id)}
-                >
-                  💬
-                </button>
-                <span className="ml-1">{commentCounts[post._id] ?? 0}</span>
-                {/* Bouton signalement */}
-                <button
-                  className="ml-auto text-red-400 hover:text-red-600"
-                  title="Signaler ce post"
-                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
-                  onClick={() => openReportModal(post._id)}
-                >
-                  🚩
-                </button>
+                    <FaHeart
+                      className="mr-1"
+                      style={{
+                        color: likedPosts[post._id] ? '#e53e3e' : '#fff',
+                        stroke: likedPosts[post._id] ? '#e53e3e' : '#6b7280',
+                        strokeWidth: 40,
+                        fontSize: '1.1rem',
+                        marginLeft: '2px',
+                        boxSizing: 'content-box',
+                        overflow: 'visible',
+                        transition: 'color 0.15s, stroke 0.15s'
+                      }}
+                    />
+                    <span className="ml-1" style={{ color: '#6b7280', fontSize: '0.98rem' }}>{likeCounts[post._id] ?? 0}</span>
+                  </button>
+                  <button
+                    className="text-gray-500 flex items-center"
+                    title="Répondre au commentaire"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
+                    onClick={() => handleOpenComments(post._id)}
+                  >
+                    <FaRegComment className="mr-1" style={{ fontSize: '1.1rem' }} />
+                    <span style={{ fontSize: '0.98rem' }}>{commentCounts[post._id] ?? 0}</span>
+                  </button>
+                  <button
+                    className="text-gray-400 hover:text-gray-600 flex items-center"
+                    title="Signaler ce message"
+                    style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.1rem' }}
+                    onClick={() => openReportModal(post._id)}
+                  >
+                    <FaFlag style={{ color: '#6b7280', fontSize: '1.1rem' }} />
+                  </button>
+                </div>
               </div>
               {openCommentPostId === post._id && (
                 <div className="mt-2">
