@@ -3,6 +3,8 @@ import Navbar from "../../components/Navbar";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { FaHeart, FaRegComment } from "react-icons/fa";
+import CommentForm from "../../components/CommentForm";
+import FeedList from "../../components/feedlist";
 
 export default function Recherche() {
   const [user, setUser] = useState(null);
@@ -12,6 +14,12 @@ export default function Recherche() {
   const [posts, setPosts] = useState([]);
   const [userLoading, setUserLoading] = useState(false);
   const [userSearched, setUserSearched] = useState(false);
+  const [openCommentPostId, setOpenCommentPostId] = useState(null);
+  const [comments, setComments] = useState({});
+  const [loadingComments, setLoadingComments] = useState(false);
+  const [commentCounts, setCommentCounts] = useState({});
+  const [likeCounts, setLikeCounts] = useState({});
+  const [likedPosts, setLikedPosts] = useState({});
   const router = useRouter();
   const debounceRef = useRef();
 
@@ -65,6 +73,121 @@ export default function Recherche() {
       .then(data => setPosts(data));
   }, []);
 
+  // Récupère les likes pour chaque post
+  const fetchLikes = async (postsList) => {
+    const counts = {};
+    const liked = {};
+    await Promise.all(
+      postsList.map(async (post) => {
+        try {
+          const res = await fetch(`/api/posts/${post._id}/likes`, { credentials: 'include' });
+          const data = await res.json();
+          counts[post._id] = data.count || 0;
+          liked[post._id] = !!data.liked;
+        } catch {
+          counts[post._id] = 0;
+          liked[post._id] = false;
+        }
+      })
+    );
+    setLikeCounts(counts);
+    setLikedPosts(liked);
+  };
+
+  // Charge les commentaires d'un post
+  const fetchComments = async (postId) => {
+    setLoadingComments(true);
+    try {
+      const res = await fetch(`/api/comments/post/${postId}`);
+      const data = await res.json();
+      setComments(prev => ({
+        ...prev,
+        [postId]: Array.isArray(data) ? data : []
+      }));
+    } catch {
+      setComments(prev => ({
+        ...prev,
+        [postId]: []
+      }));
+    } finally {
+      setLoadingComments(false);
+    }
+  };
+
+  // Quand on clique sur la bulle
+  const handleOpenComments = (postId) => {
+    if (openCommentPostId === postId) {
+      setOpenCommentPostId(null);
+    } else {
+      setOpenCommentPostId(postId);
+      fetchComments(postId);
+    }
+  };
+
+  // Ajout d'un commentaire
+  const handleAddComment = async (postId, content, parent = null) => {
+    try {
+      const res = await fetch(`/api/comments/${postId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ content, parent }),
+      });
+      if (!res.ok) throw new Error("Erreur lors de l'ajout du commentaire");
+      const { comment } = await res.json();
+      setCommentCounts(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || 0) + 1
+      }));
+      setComments(prev => ({
+        ...prev,
+        [postId]: prev[postId] ? [comment, ...prev[postId]] : [comment]
+      }));
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // Like/unlike un post
+  const handleLike = async (postId) => {
+    const alreadyLiked = likedPosts[postId];
+    try {
+      const url = `/api/posts/${postId}/like`;
+      const method = alreadyLiked ? 'DELETE' : 'POST';
+      const res = await fetch(url, { method, credentials: 'include' });
+      if (!res.ok) {
+        let msg = 'Erreur lors du like';
+        try {
+          const data = await res.json();
+          if (data && data.message) msg = data.message;
+        } catch {}
+        await fetchLikes(posts);
+        alert(msg);
+        return;
+      }
+      await fetchLikes(posts);
+    } catch (err) {
+      await fetchLikes(posts);
+      alert(err.message);
+    }
+  };
+
+  // Synchronise likes et compteurs au chargement des posts
+  useEffect(() => {
+    if (posts.length > 0) {
+      // Utilise une IIFE pour attendre la fin de fetchLikes avant de continuer
+      (async () => {
+        await fetchLikes(posts);
+        // Compteurs de commentaires
+        const counts = {};
+        posts.forEach(post => {
+          counts[post._id] = post.comments?.length || 0;
+        });
+        setCommentCounts(counts);
+      })();
+    }
+  }, [posts]);
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
@@ -117,45 +240,9 @@ export default function Recherche() {
           </div>
         )}
       </div>
+      {/* Affichage des posts publics via FeedList */}
       <div className="px-2">
-        {posts.length > 0 ? (
-          posts.map(post => (
-            <div key={post._id} className="bg-white rounded-lg shadow p-4 mb-4">
-              <div className="flex items-center mb-2">
-                <div className="w-10 h-10 rounded-full bg-gray-200 mr-3" />
-                <div>
-                  <div className="font-semibold">{post.author?.username || post.author?.name || "Utilisateur"}</div>
-                  <div className="text-xs text-gray-400">{new Date(post.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} {new Date(post.createdAt).toLocaleDateString()}</div>
-                </div>
-              </div>
-              <div className="mb-2 text-gray-800">{post.content}</div>
-              {post.comments && post.comments.length > 0 && (
-                <div className="bg-gray-100 rounded p-2 mb-2">
-                  {post.comments.map((c, i) => (
-                    <div key={i} className="mb-1">
-                      <span className="font-semibold text-sm">{c.author?.username || c.author?.name || "<Deleted User>"}</span>
-                      <span className="ml-2 text-gray-700 text-sm">{c.content}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex items-center justify-between mt-2">
-                <div className="flex items-center space-x-4">
-                  <button className="text-red-500 flex items-center">
-                    <FaHeart className="mr-1" />
-                    <span>{post.likes?.length || 0}</span>
-                  </button>
-                  <button className="text-gray-500 flex items-center">
-                    <FaRegComment className="mr-1" />
-                    <span>{post.comments?.length || 0}</span>
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))
-        ) : (
-          <div className="text-center text-gray-400 mt-8">Aucun post public trouvé.</div>
-        )}
+        <FeedList publicOnly />
       </div>
     </div>
   );

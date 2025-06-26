@@ -39,7 +39,7 @@ export async function createPost(req, res) {
 export async function getAllPosts(req, res) {
   try {
     const posts = await Post.find()
-    .populate('author', 'username profilePicture')
+    .populate('author', 'username profilePicture isPrivate')
     .sort({ createdAt: -1 });
     res.status(200).json(posts);
   } catch (err) {

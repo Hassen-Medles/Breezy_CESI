@@ -1,16 +1,10 @@
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import {
-  FaUserCircle,
-  FaBookmark,
-  FaHeart,
-  FaEllipsisH,
-} from "react-icons/fa";
-import { FiPlus } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa";
 import Navbar from "../../components/Navbar";
 import { Footer } from "../../components/FooterSwitcher/Footers";
-import PostCardList from "../../components/PostCardList";
+import FeedList from "../../components/feedlist";
 
 export default function ProfilPage() {
   const [user, setUser] = useState(null);
@@ -136,7 +130,7 @@ export default function ProfilPage() {
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-2xl p-6 shadow-inner min-h-[250px] flex flex-col justify-center mb-8">
             {user && user._id ? (
-              <PostCardList userId={user._id} onCountChange={setPostCount} />
+              <FeedList userId={user._id} />
             ) : (
               <div className="text-red-500">Impossible de récupérer le profil utilisateur</div>
             )}
