@@ -4,7 +4,7 @@ const notificationSchema = new mongoose.Schema({
     type: {
         type: String,
         required: true,
-        enum: ['like', 'comment', 'follow', 'system'],
+        enum: ['like', 'comment', 'follow', 'system', 'mention'],
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,

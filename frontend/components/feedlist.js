@@ -10,6 +10,7 @@ const FeedList = forwardRef((props, ref) => {
   const [commentCounts, setCommentCounts] = useState({});
   const [likeCounts, setLikeCounts] = useState({});
   const [likedPosts, setLikedPosts] = useState({});
+  const [user, setUser] = useState(null);
 
   // Récupère les likes pour chaque post
   const fetchLikes = async (posts) => {
@@ -35,25 +36,10 @@ const FeedList = forwardRef((props, ref) => {
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/posts");
+      const res = await fetch("/api/feed/following", { credentials: "include" })
       const data = await res.json();
       setPosts(Array.isArray(data) ? data : []);
-      if (Array.isArray(data)) {
-        const counts = {};
-        await Promise.all(
-          data.map(async post => {
-            try {
-              const res = await fetch(`/api/comments/post/${post._id}`);
-              const comments = await res.json();
-              counts[post._id] = Array.isArray(comments) ? comments.length : 0;
-            } catch {
-              counts[post._id] = 0;
-            }
-          })
-        );
-        setCommentCounts(counts);
-        await fetchLikes(data); // Ajout récupération des likes
-      }
+      // ...reste du code pour charger les likes/commentaires...
     } catch (err) {
       setPosts([]);
     } finally {
@@ -160,7 +146,23 @@ const FeedList = forwardRef((props, ref) => {
             <div key={post._id} className="bg-white border rounded-lg mb-3 p-4 shadow-sm mt-2">
               <div className="flex items-center gap-2 mb-1">
                 {post.author?.profilePicture ? (
-                  <img src={post.author.profilePicture} alt="avatar" className="w-8 h-8 rounded-full mr-3 object-cover" />
+                  <img
+                    src={
+                      post.author.profilePicture && post.author.profilePicture.startsWith('http')
+                        ? post.author.profilePicture
+                        : post.author.profilePicture
+                          ? `http://localhost:5000/uploads/${post.author.profilePicture}`
+                          : '/defaultimage.png'
+                    }
+                    alt="Photo de profil"
+                    className="w-8 h-8 rounded-full mr-3 object-cover"
+                    onError={e => {
+                      if (e.target.src.endsWith('/defaultimage.png')) return;
+                      e.target.onerror = null;
+                      e.target.src = '/defaultimage.png';
+                      e.target.className = 'w-8 h-8 object-cover rounded-full';
+                    }}
+                  />
                 ) : (
                   <div className="w-8 h-8 bg-gray-300 rounded-full mr-3" />
                 )}

@@ -48,16 +48,16 @@ export default function Conversation() {
     e.preventDefault();
     if (!message.trim()) return;
 
-  const res = await fetch("/api/messages", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({
-      conversationId: id,
-      content: message,
-      receiver: conversation?.otherUser?._id // à adapter selon ta structure
-    })
-  });
+    const res = await fetch("/api/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({
+        conversationId: id,
+        content: message,
+        receiver: conversation?.otherUser?._id // à adapter selon ta structure
+      })
+    });
 
     if (res.ok) {
       const newMsg = await res.json();
@@ -73,7 +73,8 @@ export default function Conversation() {
     <>
       <Navbar title="CONVERSATION" />
       <ConversationsHeader name={conversation?.otherUser?.username || "Utilisateur"} profilePicture={conversation?.otherUser?.profilePicture} />
-      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50" style={{ minHeight: "80vh" }}>
+      {/* Ajout d'un margin-top pour éviter la collision avec la navbar */}
+      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50 mt-8" style={{ minHeight: "80vh" }}>
         {messages.map(msg =>
           msg.sender === conversation?.me ? (
             <MessageSent key={msg._id} content={msg.content} />

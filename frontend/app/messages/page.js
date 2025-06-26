@@ -65,9 +65,10 @@ export default function Messages() {
   return (
     <>
       <Navbar title="MESSAGES" />
-      <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex flex-col items-center justify-start bg-gray-50">
         <SearchBar />
-        <div className="flex-1 overflow-y-auto w-full max-w-md">
+        {/* Ajout d'un margin-top pour éviter la collision avec la navbar */}
+        <div className="flex-1 overflow-y-auto w-full max-w-md pb-20 mt-20">
           {loading ? (
             <div className="text-gray-400 text-center mt-8">Chargement...</div>
           ) : (

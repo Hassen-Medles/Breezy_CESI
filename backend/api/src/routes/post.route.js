@@ -23,5 +23,6 @@ router.post('/posts/:postId/like', auth, postController.likePost);
 router.delete('/posts/:postId/like', auth, postController.unlikePost);
 // Récupérer le nombre de likes et si l'utilisateur a liké
 router.get('/posts/:postId/likes', auth, postController.getLikes);
+router.get("/feed/following", auth, postController.getFollowedPosts);
 
 export default router;
