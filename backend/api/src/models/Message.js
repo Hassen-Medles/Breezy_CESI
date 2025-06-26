@@ -19,7 +19,7 @@ const messageSchema = new mongoose.Schema({
     image: { type: String },
     content: {
         type: String,
-        required: true,
+        required: false, // Autorise les messages sans texte si une image est présente
         maxlength: 500
     },
     deleted: {

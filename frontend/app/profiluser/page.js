@@ -57,6 +57,8 @@ export default function ProfilUserPage() {
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
   }
+  // Debug : voir la structure de l'utilisateur récupéré
+  console.log('USER DATA:', user);
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar title="PROFIL" />
@@ -88,16 +90,7 @@ export default function ProfilUserPage() {
               <div className="flex-shrink-0 w-20 h-20 md:w-36 md:h-36 md:-ml-8">
                 <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
                   {user && user.profilePicture ? (
-                    <img
-                      src={user.profilePicture.startsWith('http') ? user.profilePicture : `http://localhost:5000/uploads/${user.profilePicture}`}
-                      alt="Photo de profil"
-                      className="w-full h-full object-cover rounded-full border border-black"
-                      onError={e => {
-                        e.target.onerror = null;
-                        e.target.src = '/defaultimage.png';
-                        e.target.className = 'w-full h-full object-cover rounded-full';
-                      }}
-                    />
+                    <ProfileImage profilePicture={user.profilePicture} />
                   ) : (
                     <FaUserCircle size={50} className="md:size-[110px] text-sky-300" />
                   )}
@@ -113,11 +106,11 @@ export default function ProfilUserPage() {
               {/* Stats */}
               <div className="flex gap-8 md:gap-16 justify-center items-center w-full">
                 <div className="text-center">
-                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.following}</p>
+                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.followers}</p>
                   <p className="text-xs md:text-sm text-gray-500">Abonnés</p>
                 </div>
                 <div className="text-center">
-                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.followers}</p>
+                  <p className="text-xs md:text-xl font-bold text-gray-800">{followCounts.following}</p>
                   <p className="text-xs md:text-sm text-gray-500">Suivis</p>
                 </div>
               </div>
@@ -142,5 +135,23 @@ export default function ProfilUserPage() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+function ProfileImage({ profilePicture }) {
+  const [error, setError] = useState(false);
+  if (error || !profilePicture) {
+    return <FaUserCircle size={50} className="md:size-[110px] text-sky-300" />;
+  }
+  let src = profilePicture.startsWith('http')
+    ? profilePicture
+    : `http://localhost:5000/uploads/${profilePicture}`;
+  return (
+    <img
+      src={src}
+      alt="Photo de profil"
+      className="w-full h-full object-cover rounded-full border border-black"
+      onError={() => setError(true)}
+    />
   );
 }

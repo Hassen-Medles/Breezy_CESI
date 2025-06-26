@@ -29,22 +29,28 @@ export default function ConversationsHeader({ profilePicture, name, isOnline }) 
         </button>
       </Link>
       {/* Avatar */}
-      {showDefault ? (
-        <span className="w-10 h-10 rounded-full mr-3 bg-sky-300 flex items-center justify-center">
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="12" cy="12" r="12" fill="#38BDF8"/>
-            <circle cx="12" cy="10" r="4" fill="#fff"/>
-            <ellipse cx="12" cy="18" rx="6" ry="3" fill="#fff"/>
-          </svg>
-        </span>
-      ) : (
-        <img
-          src={profileUrl}
-          alt="avatar"
-          className="w-10 h-10 rounded-full object-cover mr-3 border border-gray-300"
-          onError={e => { e.target.onerror = null; e.target.src = '/defaultimage.png'; e.target.className = 'w-10 h-10 rounded-full mr-3 bg-sky-300 object-cover'; }}
-        />
-      )}
+      <div className="flex-shrink-0 w-10 h-10">
+        <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
+          {profilePicture ? (
+            <img
+              src={profileUrl}
+              alt="Photo de profil"
+              className="w-full h-full object-cover rounded-full border border-black"
+              onError={e => {
+                e.target.onerror = null;
+                e.target.src = '/defaultimage.png';
+                e.target.className = 'w-full h-full object-cover rounded-full';
+              }}
+            />
+          ) : (
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="12" r="12" fill="#38BDF8"/>
+              <circle cx="12" cy="10" r="4" fill="#fff"/>
+              <ellipse cx="12" cy="18" rx="6" ry="3" fill="#fff"/>
+            </svg>
+          )}
+        </div>
+      </div>
       {/* Infos utilisateur */}
       <div>
         <div className="flex items-center">

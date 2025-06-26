@@ -3,6 +3,40 @@ import Navbar from "../../components/Navbar";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import FeedList from "../../components/feedlist";
+import { FaUserCircle } from "react-icons/fa";
+
+function UserSearchAvatar({ profilePicture, username }) {
+  const [error, setError] = useState(false);
+  // Si la photo n'existe pas ou a échoué à charger, affiche l'icône ou l'image par défaut
+  if (error || !profilePicture) {
+    return (
+      <img
+        src={"/defaultimage.png"}
+        alt="default avatar"
+        className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-300 bg-sky-300 flex items-center justify-center"
+        onError={() => setError(true)}
+        loading="lazy"
+      />
+    );
+  }
+  // Toujours utiliser le backend pour les images locales
+  let src = profilePicture.startsWith('http')
+    ? profilePicture
+    : `http://localhost:5000/uploads/${profilePicture}`;
+  // Ajoute un cache-busting pour éviter les problèmes de cache après update
+  if (src && !profilePicture.startsWith('http')) {
+    src += `?v=${profilePicture.length}`;
+  }
+  return (
+    <img
+      src={src}
+      alt={username}
+      className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-300"
+      onError={() => setError(true)}
+      loading="lazy"
+    />
+  );
+}
 
 export default function Recherche() {
   const [user, setUser] = useState(null);
@@ -217,24 +251,12 @@ export default function Recherche() {
                     className="flex items-center py-2 px-4 border-b last:border-b-0 hover:bg-gray-100 cursor-pointer"
                     onClick={() => router.push(`/profiluser?id=${u._id}`)}
                   >
-                    <>
-                      {u.profilePicture ? (
-                        <img src={u.profilePicture.startsWith('http') ? u.profilePicture : `http://localhost:5000/uploads/${u.profilePicture}`} alt={u.username} className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-300" onError={e => { e.target.onerror = null; e.target.src = '/defaultimage.png'; e.target.className = 'w-8 h-8 rounded-full mr-3 bg-sky-300 object-cover'; }} />
-                      ) : (
-                        <span className="w-8 h-8 rounded-full mr-3 bg-sky-300 flex items-center justify-center">
-                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <circle cx="12" cy="12" r="12" fill="#38BDF8"/>
-                            <circle cx="12" cy="10" r="4" fill="#fff"/>
-                            <ellipse cx="12" cy="18" rx="6" ry="3" fill="#fff"/>
-                          </svg>
-                        </span>
-                      )}
-                      <span className="font-medium">{u.username}</span>
-                      <span className="ml-2 text-gray-500 text-xs">{u.email}</span>
-                      <span className={`ml-3 text-xs font-semibold px-2 py-1 rounded ${u.isPrivate ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
-                        {u.isPrivate ? 'Privé' : 'Public'}
-                      </span>
-                    </>
+                    {<UserSearchAvatar profilePicture={u.profilePicture} username={u.username} />}
+                    <span className="font-medium">{u.username}</span>
+                    <span className="ml-2 text-gray-500 text-xs">{u.email}</span>
+                    <span className={`ml-3 text-xs font-semibold px-2 py-1 rounded ${u.isPrivate ? 'bg-red-100 text-red-600' : 'bg-green-100 text-green-600'}`}>
+                      {u.isPrivate ? 'Privé' : 'Public'}
+                    </span>
                   </li>
                 ))}
               </ul>

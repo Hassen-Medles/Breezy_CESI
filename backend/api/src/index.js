@@ -12,7 +12,6 @@ import cookieParser from 'cookie-parser';
 import dotenv from 'dotenv';
 
 dotenv.config();
-console.log('AUTH_TOKEN:', process.env.AUTH_TOKEN);
 
 const app = express();
 // Configuration CORS robuste

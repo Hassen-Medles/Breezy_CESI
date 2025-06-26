@@ -1,6 +1,6 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import CommentForm from "./CommentForm";
-import { FaHeart, FaRegComment, FaFlag } from "react-icons/fa";
+import { FaHeart, FaRegComment, FaFlag, FaUserCircle } from "react-icons/fa";
 
 const REPORT_REASONS = [
   "Spam ou publicité",
@@ -250,25 +250,9 @@ const FeedList = forwardRef((props, ref) => {
             <div key={post._id} className="bg-white rounded-lg shadow p-4 mb-4">
               <div className="flex items-center mb-2">
                 {post.author?.profilePicture ? (
-                  <img
-                    src={
-                      post.author.profilePicture && post.author.profilePicture.startsWith('http')
-                        ? post.author.profilePicture
-                        : post.author.profilePicture
-                          ? `http://localhost:5000/uploads/${post.author.profilePicture}`
-                          : '/defaultimage.png'
-                    }
-                    alt="Photo de profil"
-                    className="w-10 h-10 rounded-full mr-3 object-cover"
-                    onError={e => {
-                      if (e.target.src.endsWith('/defaultimage.png')) return;
-                      e.target.onerror = null;
-                      e.target.src = '/defaultimage.png';
-                      e.target.className = 'w-10 h-10 object-cover rounded-full';
-                    }}
-                  />
+                  <FeedProfileImage profilePicture={post.author.profilePicture} />
                 ) : (
-                  <div className="w-10 h-10 bg-gray-300 rounded-full mr-3" />
+                  <FaUserCircle size={40} className="text-sky-300 w-10 h-10 mr-3" />
                 )}
                 <div>
                   <div className="font-semibold">{post.author?.username || post.authorName || "<deleted user>"}</div>
@@ -400,5 +384,27 @@ const FeedList = forwardRef((props, ref) => {
     </div>
   );
 });
+
+function FeedProfileImage({ profilePicture }) {
+  const [error, setError] = useState(false);
+  if (error || !profilePicture) {
+    return <FaUserCircle size={40} className="text-sky-300 w-10 h-10 mr-3" />;
+  }
+  let src = profilePicture.startsWith('http')
+    ? profilePicture
+    : `http://localhost:5000/uploads/${profilePicture}`;
+  // Ajoute un cache-busting pour éviter les problèmes de cache après update
+  if (src && !profilePicture.startsWith('http')) {
+    src += `?v=${profilePicture.length}`;
+  }
+  return (
+    <img
+      src={src}
+      alt="Photo de profil"
+      className="w-10 h-10 rounded-full mr-3 object-cover"
+      onError={() => setError(true)}
+    />
+  );
+}
 
 export default FeedList;

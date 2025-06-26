@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import getProfilePictureUrl from "./getProfilePictureUrl";
 
 export default function Friend({name, content, messageread, time, photo, isUnreadFromFriend}) {
 
@@ -22,7 +23,7 @@ export default function Friend({name, content, messageread, time, photo, isUnrea
             <li className="flex items-center px-4 py-3 border-b border-gray-100 cursor-pointer">
                 {photo ? (
                   <img
-                    src={photo.startsWith('http') ? photo : `http://localhost:5000/uploads/${photo}`}
+                    src={getProfilePictureUrl(photo)}
                     alt={name}
                     className="w-10 h-10 rounded-full mr-3 object-cover border border-gray-300"
                     onError={e => { e.target.onerror = null; e.target.src = '/defaultimage.png'; e.target.className = 'w-10 h-10 rounded-full mr-3 bg-sky-300 object-cover'; }}

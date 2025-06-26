@@ -6,6 +6,14 @@ import Navbar from "../../components/Navbar";
 import { Footer } from "../../components/FooterSwitcher/Footers";
 import FeedList from "../../components/feedlist";
 
+function getProfilePictureUrl(profilePicture) {
+  if (!profilePicture) return null;
+  if (profilePicture.startsWith('http')) return profilePicture;
+  // Utilise l'URL du service auth-service (port 5000)
+  const uploadBase = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:5000/uploads/';
+  return uploadBase.replace(/\/$/, '') + '/' + profilePicture;
+}
+
 export default function ProfilPage() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -36,6 +44,12 @@ export default function ProfilPage() {
             .then(res => res.ok ? res.json() : [])
             .then(setPosts);
         }
+        // Ajout debug : log la valeur de profilePicture et l'URL générée
+        if (data && data.profilePicture) {
+          const url = getProfilePictureUrl(data.profilePicture);
+          // eslint-disable-next-line no-console
+          console.log('profilePicture:', data.profilePicture, 'URL utilisée:', url);
+        }
       })
       .catch(() => {
         router.push("/");
@@ -60,7 +74,7 @@ export default function ProfilPage() {
                 <div className="w-full h-full bg-white rounded-full flex items-center justify-center">
                   {user && user.profilePicture ? (
                     <img
-                      src={user.profilePicture.startsWith('http') ? user.profilePicture : `http://localhost:5000/uploads/${user.profilePicture}`}
+                      src={getProfilePictureUrl(user.profilePicture)}
                       alt="Photo de profil"
                       className="w-full h-full object-cover rounded-full border border-black"
                       onError={e => {

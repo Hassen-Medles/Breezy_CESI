@@ -9,6 +9,7 @@ export default function Messages() {
   const [friends, setFriends] = useState([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -102,20 +103,24 @@ export default function Messages() {
             <div className="text-gray-400 text-center mt-8">Chargement...</div>
           ) : (
             <ul>
-              {friends.map(friend => (
-                <li key={friend._id}>
-                  <button onClick={() => handleGoToConversation(friend._id)} className="w-full text-left">
-                    <Friend
-                      name={friend.username}
-                      content={friend.lastMsg}
-                      messageread={friend.lastMsgRead}
-                      time={friend.lastMsgTime ? `Vu il y a ${formatTimeAgo(friend.lastMsgTime)}` : ""}
-                      photo={friend.profilePicture || friend.photo}
-                      isUnreadFromFriend={friend.lastMsg && !friend.lastMsgRead && friend.lastMsgFrom === friend._id}
-                    />
-                  </button>
-                </li>
-              ))}
+              {friends.map(friend => {
+                // Utilise la même logique que FeedList pour la photo de profil
+                let photo = friend.profilePicture || friend.photo || '';
+                return (
+                  <li key={friend._id}>
+                    <button onClick={() => handleGoToConversation(friend._id)} className="w-full text-left">
+                      <Friend
+                        name={friend.username}
+                        content={friend.lastMsg}
+                        messageread={friend.lastMsgRead}
+                        time={friend.lastMsgTime ? `Vu il y a ${formatTimeAgo(friend.lastMsgTime)}` : ""}
+                        photo={photo}
+                        isUnreadFromFriend={friend.lastMsg && !friend.lastMsgRead && friend.lastMsgFrom === friend._id}
+                      />
+                    </button>
+                  </li>
+                );
+              })}
               {friends.length === 0 && (
                 <div className="text-gray-400 text-center mt-8">Aucun ami suivi.</div>
               )}

@@ -63,14 +63,22 @@ export default function Conversation() {
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!message.trim() && previews.length === 0) return;
+    if (!conversation?.otherUser?._id) {
+      alert("Impossible d'envoyer le message : destinataire inconnu.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("conversationId", id);
     formData.append("content", message);
-    formData.append("receiver", conversation?.otherUser?._id);
+    formData.append("receiver", conversation.otherUser._id);
     if (previews.length > 0) {
-      // On n'envoie que la première image (pour multi-image, adapter le backend)
-      formData.append("image", previews[0].file);
+      const img = previews[0];
+      if (img.file) {
+        formData.append("image", img.file);
+      } else if (img.blob) {
+        formData.append("image", img.blob, img.name || 'photo_camera.jpg');
+      }
     }
 
     const res = await fetch("http://localhost:5001/api/messages", {
@@ -85,7 +93,8 @@ export default function Conversation() {
       setMessage("");
       setPreviews([]);
     } else {
-      alert("Erreur lors de l'envoi du message");
+      const data = await res.json().catch(() => ({}));
+      alert(data.message || "Erreur lors de l'envoi du message");
     }
   };
 
@@ -208,12 +217,19 @@ export default function Conversation() {
               <div key={msg._id} className="flex flex-col items-end mb-2">
                 <MessageSent content={msg.content} />
                 {msg.image && (
-                  <img
-                    src={`${API_URL}/uploads/${msg.image}`}
-                    alt="Image envoyée"
-                    style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
-                    className="self-end"
-                  />
+                  <a
+                    href={`${API_URL}/uploads/${msg.image}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'inline-block', marginTop: 8 }}
+                  >
+                    <img
+                      src={`${API_URL}/uploads/${msg.image}`}
+                      alt="Image envoyée"
+                      style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                      className="self-end cursor-pointer hover:opacity-80 transition"
+                    />
+                  </a>
                 )}
               </div>
             );
@@ -235,12 +251,19 @@ export default function Conversation() {
                   profilePicture={profilePicture}
                 />
                 {msg.image && (
-                  <img
-                    src={`${API_URL}/uploads/${msg.image}`}
-                    alt="Image envoyée"
-                    style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, marginTop: 8 }}
-                    className="self-start"
-                  />
+                  <a
+                    href={`${API_URL}/uploads/${msg.image}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ display: 'inline-block', marginTop: 8 }}
+                  >
+                    <img
+                      src={`${API_URL}/uploads/${msg.image}`}
+                      alt="Image envoyée"
+                      style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, boxShadow: '0 2px 8px rgba(0,0,0,0.08)' }}
+                      className="self-start cursor-pointer hover:opacity-80 transition"
+                    />
+                  </a>
                 )}
               </div>
             );

@@ -8,6 +8,14 @@ function getApiUrl(path) {
   return base.replace(/\/$/, "") + path;
 }
 
+function getProfilePictureUrl(profilePicture) {
+  if (!profilePicture) return null;
+  if (profilePicture.startsWith('http')) return profilePicture;
+  // Utilise l'URL du service auth-service (port 5000)
+  const uploadBase = process.env.NEXT_PUBLIC_UPLOADS_URL || 'http://localhost:5000/uploads/';
+  return uploadBase.replace(/\/$/, '') + '/' + profilePicture;
+}
+
 export default function ModifierProfil() {
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
@@ -27,11 +35,7 @@ export default function ModifierProfil() {
           setUser(data);
           setUsername(data.username || "");
           setDescription(data.description || "");
-          setPreview(data.profilePicture ? (
-            data.profilePicture.startsWith('http')
-              ? data.profilePicture
-              : getApiUrl(`/uploads/${data.profilePicture}`)
-          ) : null);
+          setPreview(getProfilePictureUrl(data.profilePicture));
         }
       });
   }, []);
