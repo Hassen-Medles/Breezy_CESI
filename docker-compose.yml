@@ -48,10 +48,12 @@ services:
     ports:
       - "5001:5001"
     env_file:
-    - ./backend/api/.env
+      - ./backend/api/.env
     environment:
       - MONGO_URI=mongodb://mongo:27017/breezy_auth
       - PORT=5001
+    volumes:
+      - ./backend/api/uploads:/app/uploads
     depends_on:
       - mongo
 
