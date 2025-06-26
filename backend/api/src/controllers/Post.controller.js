@@ -145,7 +145,15 @@ export async function likePost(req, res) {
     const post = await Post.findById(postId);
     // Récupérer l'utilisateur qui like
     const liker = await (await import('../models/User.js')).default.findById(userId);
-    if (post && String(post.author) !== String(userId) && liker) {
+    // Récupérer l'auteur du post
+    const postAuthor = await (await import('../models/User.js')).default.findById(post.author);
+    if (
+      post &&
+      String(post.author) !== String(userId) &&
+      liker &&
+      postAuthor &&
+      !(postAuthor.roles && postAuthor.roles.includes("administrator"))
+    ) {
       // Créer une notification pour l'auteur du post avec le nom du liker
       await Notification.create({
         type: 'like',
