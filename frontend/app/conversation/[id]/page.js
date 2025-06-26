@@ -1,7 +1,6 @@
 'use client'
 import { useParams } from "next/navigation";
 import { useEffect, useState, useRef } from "react";
-import Navbar from "../../../components/Navbar";
 import DateSeparator from "../../../components/Conversations/DateSeparator";
 import MessageSent from "../../../components/Conversations/MessageSent";
 import MessageRecieved from "../../../components/Conversations/MessageRecieved";
@@ -9,6 +8,7 @@ import ConversationsHeader from "../../../components/Conversations/Conversations
 import { FaCamera } from "react-icons/fa";
 import { LuImage } from "react-icons/lu";
 import { FaRegPaperPlane } from "react-icons/fa";
+import Navbar from "../../../components/Navbar";
 
 export default function Conversation() {
   const { id } = useParams();
@@ -73,12 +73,102 @@ export default function Conversation() {
     }
   };
 
+  const handleCameraClick = async () => {
+    // Ouvre la caméra pour prendre une photo
+    if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        // Crée un élément vidéo temporaire pour capturer l'image
+        const video = document.createElement('video');
+        video.srcObject = stream;
+        video.play();
+        // Crée un canvas pour capturer la frame
+        const canvas = document.createElement('canvas');
+        video.addEventListener('loadedmetadata', () => {
+          canvas.width = video.videoWidth;
+          canvas.height = video.videoHeight;
+          // Affiche la vidéo dans une modale simple
+          const modal = document.createElement('div');
+          modal.style.position = 'fixed';
+          modal.style.top = '0';
+          modal.style.left = '0';
+          modal.style.width = '100vw';
+          modal.style.height = '100vh';
+          modal.style.background = 'rgba(0,0,0,0.7)';
+          modal.style.display = 'flex';
+          modal.style.alignItems = 'center';
+          modal.style.justifyContent = 'center';
+          modal.style.zIndex = '9999';
+          video.style.maxWidth = '90vw';
+          video.style.maxHeight = '70vh';
+          video.style.objectFit = 'contain';
+          video.style.borderRadius = '1em';
+          video.style.background = '#000';
+          video.style.boxShadow = '0 4px 24px rgba(0,0,0,0.3)';
+          video.style.display = 'block';
+          video.style.margin = '0 auto';
+          // Centrage horizontal strict
+          video.style.left = '50%';
+          video.style.transform = 'translateX(-50%)';
+          video.style.position = 'relative';
+          modal.appendChild(video);
+          // Bouton capture
+          const captureBtn = document.createElement('button');
+          captureBtn.innerText = 'Prendre la photo';
+          captureBtn.style.position = 'absolute';
+          captureBtn.style.bottom = '10%';
+          captureBtn.style.left = '50%';
+          captureBtn.style.transform = 'translateX(-50%)';
+          captureBtn.style.padding = '1em 2em';
+          captureBtn.style.background = '#2563eb';
+          captureBtn.style.color = 'white';
+          captureBtn.style.border = 'none';
+          captureBtn.style.borderRadius = '1em';
+          captureBtn.style.fontSize = '1.2em';
+          captureBtn.style.cursor = 'pointer';
+          modal.appendChild(captureBtn);
+          // Bouton annuler
+          const cancelBtn = document.createElement('button');
+          cancelBtn.innerText = 'Annuler';
+          cancelBtn.style.position = 'absolute';
+          cancelBtn.style.top = '5%';
+          cancelBtn.style.right = '5%';
+          cancelBtn.style.padding = '0.5em 1em';
+          cancelBtn.style.background = '#fff';
+          cancelBtn.style.color = '#2563eb';
+          cancelBtn.style.border = '1px solid #2563eb';
+          cancelBtn.style.borderRadius = '1em';
+          cancelBtn.style.fontSize = '1em';
+          cancelBtn.style.cursor = 'pointer';
+          modal.appendChild(cancelBtn);
+          document.body.appendChild(modal);
+          captureBtn.onclick = () => {
+            canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+            canvas.toBlob(blob => {
+              const url = URL.createObjectURL(blob);
+              setPreviews(prev => [...prev, { url, name: 'photo_camera.jpg', blob }]);
+              stream.getTracks().forEach(track => track.stop());
+              document.body.removeChild(modal);
+            }, 'image/jpeg');
+          };
+          cancelBtn.onclick = () => {
+            stream.getTracks().forEach(track => track.stop());
+            document.body.removeChild(modal);
+          };
+        });
+      } catch (err) {
+        alert("Impossible d'accéder à la caméra");
+      }
+    } else {
+      alert("Caméra non supportée sur ce navigateur");
+    }
+  };
+
   return (
     <>
       <Navbar title="CONVERSATION" />
-      <ConversationsHeader name={conversation?.otherUser?.username || "Utilisateur"} profilePicture={conversation?.otherUser?.profilePicture} />
-      {/* Ajout d'un margin-top pour éviter la collision avec la navbar */}
-      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50 mt-8" style={{ minHeight: "80vh" }}>
+      <ConversationsHeader name={conversation?.otherUser?.username || (conversation ? "Utilisateur" : "...")} />
+      <div className="flex flex-col flex-1 px-2 overflow-y-auto bg-gray-50" style={{ minHeight: "80vh" }}>
         {messages.map(msg =>
           msg.sender === conversation?.me ? (
             <MessageSent key={msg._id} content={msg.content} />
@@ -116,7 +206,7 @@ export default function Conversation() {
 
         {/* Message input row */}
         <div className="flex items-center">
-          <button type="button" className="mr-2 text-green-500 text-2xl cursor-pointer" onClick={() => fileCameraInputRef.current.click()}>
+          <button type="button" className="mr-4 text-sky-500 text-2xl cursor-pointer" onClick={handleCameraClick}>
             <FaCamera className="w-6 h-6" />
           </button>
           <input
@@ -130,7 +220,7 @@ export default function Conversation() {
           <input
             type="text"
             placeholder="Votre message..."
-            className="flex-1 px-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none"
+            className="flex-1 px-4 py-2 rounded-full border border-gray-200 bg-gray-50 text-sm focus:outline-none mr-4"
             value={message}
             onChange={e => setMessage(e.target.value)}
           />

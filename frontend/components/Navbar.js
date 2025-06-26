@@ -9,7 +9,7 @@ const archivoBlack = Archivo_Black({
   variable: "--font-archivo-black",
 });
 
-export default function Navbar({ title }) {
+export default function Navbar({ title, showEnvelope }) {
   return (
     <header>
       <nav className="fixed top-0 left-0 w-full z-50 flex items-center justify-center space-x-3 h-20 bg-white bg-opacity-95 backdrop-blur-md shadow-md border-b border-gray-200">
@@ -40,7 +40,7 @@ export default function Navbar({ title }) {
             {title}
           </span>
         </h1>
-        {title !== "PROFIL" && title !== "INSCRIPTION" && title !== "CONNEXION" && (
+        {(title === "ACCUEIL" || showEnvelope) && (
           <Link
             href="/messages"
             className="absolute right-8 top-1/2 -translate-y-1/2 bg-white rounded-full shadow-lg p-3 hover:bg-blue-100 transition-colors"

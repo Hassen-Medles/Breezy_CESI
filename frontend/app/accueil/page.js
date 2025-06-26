@@ -53,7 +53,7 @@ export default function Accueil() {
   }
   return (
     <>
-      <Navbar title="POUR VOUS" />
+      <Navbar title="POUR VOUS" showEnvelope />
       <div className="h-20" />
       <div className="pb-24">
         <PostForm onPostCreated={handlePostCreated} />

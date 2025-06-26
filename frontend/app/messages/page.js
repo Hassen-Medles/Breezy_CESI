@@ -62,6 +62,18 @@ export default function Messages() {
     }
   };
 
+  // Utilitaire pour afficher "il y a X min/h"
+  function formatTimeAgo(dateStr) {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 60000); // minutes
+    if (diff < 1) return "à l'instant";
+    if (diff < 60) return `il y a ${diff} min`;
+    const hours = Math.floor(diff / 60);
+    if (hours < 24) return `il y a ${hours}h`;
+    return date.toLocaleDateString();
+  }
   return (
     <>
       <Navbar title="MESSAGES" />
@@ -96,17 +108,4 @@ export default function Messages() {
       </div>
     </>
   );
-}
-
-// Utilitaire pour afficher "il y a X min/h"
-function formatTimeAgo(dateStr) {
-  if (!dateStr) return "";
-  const date = new Date(dateStr);
-  const now = new Date();
-  const diff = Math.floor((now - date) / 60000); // minutes
-  if (diff < 1) return "à l'instant";
-  if (diff < 60) return `il y a ${diff} min`;
-  const hours = Math.floor(diff / 60);
-  if (hours < 24) return `il y a ${hours}h`;
-  return date.toLocaleDateString();
 }
