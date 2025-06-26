@@ -101,6 +101,8 @@ export async function deletePost(req, res) {
     if (!post) {
       return res.status(404).json({ message: 'Post non trouvé.' });
     }
+    // Supprimer les notifications liées à ce post (like, comment, etc.)
+    await (await import('../models/Notification.js')).default.deleteMany({ postId });
     res.status(200).json({ message: 'Post supprimé avec succès.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression du post.' });

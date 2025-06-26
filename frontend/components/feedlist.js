@@ -122,14 +122,8 @@ const FeedList = forwardRef((props, ref) => {
       const method = alreadyLiked ? 'DELETE' : 'POST';
       const res = await fetch(url, { method, credentials: 'include' });
       if (!res.ok) throw new Error('Erreur lors du like');
-      setLikeCounts(prev => ({
-        ...prev,
-        [postId]: prev[postId] + (alreadyLiked ? -1 : 1)
-      }));
-      setLikedPosts(prev => ({
-        ...prev,
-        [postId]: !alreadyLiked
-      }));
+      // Recharge les likes depuis le backend pour avoir le vrai total
+      await fetchLikes(posts);
     } catch (err) {
       alert(err.message);
     }
