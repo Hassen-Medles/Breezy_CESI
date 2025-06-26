@@ -9,8 +9,10 @@ export async function getFollowedPosts(req, res) {
     // Récupère les IDs des utilisateurs suivis
     const follows = await Follow.find({ follower: userId }).select("followed");
     const followedIds = follows.map(f => f.followed);
-    // Récupère les posts des utilisateurs suivis
-    const posts = await Post.find({ author: { $in: followedIds } })
+    // Ajoute l'utilisateur connecté à la liste
+    const feedIds = [...followedIds, userId];
+    // Récupère les posts des utilisateurs suivis + soi-même
+    const posts = await Post.find({ author: { $in: feedIds } })
       .populate("author", "username profilePicture")
       .sort({ createdAt: -1 });
     res.json(posts);

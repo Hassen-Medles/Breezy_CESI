@@ -73,7 +73,7 @@ const FeedList = forwardRef((props, ref) => {
         url = "/api/posts";
       }
       if (userId) {
-        url = `/api/user/${userId}/posts`;
+        url = `/api/posts/user/${userId}`;
       }
       const res = await fetch(url, { credentials: "include" });
       let data = await res.json();
@@ -84,6 +84,7 @@ const FeedList = forwardRef((props, ref) => {
         data = Array.isArray(data) ? data.filter(post => post.author && post.author._id === userId) : [];
       }
       setPosts(Array.isArray(data) ? data : []);
+      if (props.onPostsChange) props.onPostsChange(Array.isArray(data) ? data : []);
       // Ajout : charger les likes après avoir mis à jour les posts
       await fetchLikes(Array.isArray(data) ? data : []);
       await fetchCommentCounts(Array.isArray(data) ? data : []);
@@ -224,10 +225,13 @@ const FeedList = forwardRef((props, ref) => {
 
   return (
     <div className="bg-gray-100 rounded-xl p-4 mt-6">
-      <div className="flex items-center mb-4">
-        <span className="font-bold text-lg">Tous les posts</span>
-        <span className="ml-4 text-gray-400 text-lg">{posts.length} publications</span>
-      </div>
+      {/* Enlève le titre et le compteur de publications pour le profil */}
+      {!(userId) && (
+        <div className="flex items-center mb-4">
+          <span className="font-bold text-lg">Tous les posts</span>
+          <span className="ml-4 text-gray-400 text-lg">{posts.length} publications</span>
+        </div>
+      )}
       {loading ? (
         <div>Chargement...</div>
       ) : posts.length === 0 ? (

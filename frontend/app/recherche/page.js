@@ -2,8 +2,6 @@
 import Navbar from "../../components/Navbar";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { FaHeart, FaRegComment } from "react-icons/fa";
-import CommentForm from "../../components/CommentForm";
 import FeedList from "../../components/feedlist";
 
 export default function Recherche() {
@@ -221,9 +219,15 @@ export default function Recherche() {
                   >
                     <>
                       {u.profilePicture ? (
-                        <img src={u.profilePicture} alt={u.username} className="w-8 h-8 rounded-full mr-3" />
+                        <img src={u.profilePicture.startsWith('http') ? u.profilePicture : `http://localhost:5000/uploads/${u.profilePicture}`} alt={u.username} className="w-8 h-8 rounded-full mr-3 object-cover border border-gray-300" onError={e => { e.target.onerror = null; e.target.src = '/defaultimage.png'; e.target.className = 'w-8 h-8 rounded-full mr-3 bg-sky-300 object-cover'; }} />
                       ) : (
-                        <div className="w-8 h-8 rounded-full bg-gray-200 mr-3"></div>
+                        <span className="w-8 h-8 rounded-full mr-3 bg-sky-300 flex items-center justify-center">
+                          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="12" cy="12" r="12" fill="#38BDF8"/>
+                            <circle cx="12" cy="10" r="4" fill="#fff"/>
+                            <ellipse cx="12" cy="18" rx="6" ry="3" fill="#fff"/>
+                          </svg>
+                        </span>
                       )}
                       <span className="font-medium">{u.username}</span>
                       <span className="ml-2 text-gray-500 text-xs">{u.email}</span>

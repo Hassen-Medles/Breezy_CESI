@@ -2,7 +2,6 @@
 import Navbar from "../../components/Navbar";
 import Friend from "../../components/Friend";
 import SearchBar from "../../components/Searchbar";
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -38,6 +37,7 @@ export default function Messages() {
               lastMsg: lastMsg?.content || "",
               lastMsgTime: lastMsg?.createdAt || "",
               lastMsgRead: lastMsg?.read || false,
+              lastMsgFrom: lastMsg?.from || lastMsg?.senderId || null,
             };
           })
         );
@@ -81,6 +81,8 @@ export default function Messages() {
                       content={friend.lastMsg}
                       messageread={friend.lastMsgRead}
                       time={friend.lastMsgTime ? `Vu il y a ${formatTimeAgo(friend.lastMsgTime)}` : ""}
+                      photo={friend.profilePicture || friend.photo}
+                      isUnreadFromFriend={friend.lastMsg && !friend.lastMsgRead && friend.lastMsgFrom === friend._id}
                     />
                   </button>
                 </li>

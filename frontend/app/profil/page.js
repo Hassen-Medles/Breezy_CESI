@@ -130,7 +130,7 @@ export default function ProfilPage() {
         <div className="space-y-4">
           <div className="bg-gray-100 rounded-2xl p-6 shadow-inner min-h-[250px] flex flex-col justify-center mb-8">
             {user && user._id ? (
-              <FeedList userId={user._id} />
+              <FeedList userId={user._id} onPostsChange={posts => setPostCount(posts.length)} />
             ) : (
               <div className="text-red-500">Impossible de récupérer le profil utilisateur</div>
             )}
