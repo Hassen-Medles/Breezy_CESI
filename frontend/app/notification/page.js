@@ -7,6 +7,8 @@ export default function Notifications() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [expanded, setExpanded] = useState(false);
+  const [notifications, setNotifications] = useState([]);
+  const [expandedLikes, setExpandedLikes] = useState({});
   const router = useRouter();
 
   useEffect(() => {
@@ -16,6 +18,9 @@ export default function Notifications() {
         setRequests(data);
         setLoading(false);
       });
+    fetch("/api/notification", { credentials: "include" })
+      .then(res => res.ok ? res.json() : [])
+      .then(data => setNotifications(data));
   }, []);
 
   const handleAccept = async (id) => {
@@ -36,6 +41,21 @@ export default function Notifications() {
     });
     setRequests(r => r.filter(req => req._id !== id));
   };
+
+  // Regrouper les likes par postId et collecter les utilisateurs
+  const likeNotifs = notifications.filter(n => n.type === 'like' && n.postId && (Date.now() - new Date(n.createdAt).getTime() < 24 * 60 * 60 * 1000));
+  const likesByPost = {};
+  likeNotifs.forEach(n => {
+    if (!likesByPost[n.postId]) likesByPost[n.postId] = { users: [], createdAt: n.createdAt };
+    // Utiliser le vrai nom et la photo du liker
+    const username = n.liker?.username || 'Quelqu’un';
+    const profilePicture = n.liker?.profilePicture || null;
+    if (!likesByPost[n.postId].users.find(u => u.username === username)) {
+      likesByPost[n.postId].users.push({ username, profilePicture });
+    }
+    // Garder la date la plus récente
+    if (new Date(n.createdAt) > new Date(likesByPost[n.postId].createdAt)) likesByPost[n.postId].createdAt = n.createdAt;
+  });
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">Chargement...</div>;
@@ -103,6 +123,36 @@ export default function Notifications() {
                 )}
               </div>
             )}
+          </div>
+        )}
+        <span className="block font-semibold text-lg mb-2 mt-8">Likes</span>
+        {Object.keys(likesByPost).length === 0 && <div className="text-gray-400">Aucun like</div>}
+        {Object.keys(likesByPost).length > 0 && (
+          <div>
+            {Object.entries(likesByPost).map(([postId, info], i) => {
+              const showAll = expandedLikes[postId];
+              const userCount = info.users.length;
+              // Afficher dans la ligne du haut seulement les deux premiers utilisateurs
+              const displayUsers = userCount > 2 && !showAll ? info.users.slice(0, 2) : info.users;
+              const displayNames = displayUsers.map(u => u.username).join(', ') + (userCount > 2 && !showAll ? ', ...' : '');
+              return (
+                <div
+                  key={postId}
+                  className="flex flex-col gap-2 bg-white rounded-2xl shadow p-3 mb-2 border border-gray-100 w-full cursor-pointer"
+                  onClick={() => setExpandedLikes(e => ({ ...e, [postId]: !e[postId] }))}
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="font-medium">
+                      {displayNames} {userCount > 1 ? 'ont' : 'a'} liké{userCount > 1 ? 's' : ''} votre post
+                    </span>
+                    <span className="ml-auto text-xs text-gray-400">{new Date(info.createdAt).toLocaleString()}</span>
+                  </div>
+                  {showAll && userCount > 2 && (
+                    <></>
+                  )}
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
