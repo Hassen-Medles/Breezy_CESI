@@ -172,3 +172,27 @@ export async function getLikes(req, res) {
     res.status(500).json({ message: 'Erreur lors de la récupération des likes.' });
   }
 }
+
+// Signaler un post
+export async function reportPost(req, res) {
+  try {
+    const postId = req.params.postId;
+    const { reason } = req.body;
+    // Incrémente le compteur de signalements
+    const post = await Post.findByIdAndUpdate(
+      postId,
+      { $inc: { reportCount: 1 } },
+      { new: true }
+    );
+    if (!post) {
+      return res.status(404).json({ message: 'Post non trouvé.' });
+    }
+    // Log ou traitement du motif (optionnel, ici juste log)
+    if (reason) {
+      console.log(`Post ${postId} signalé pour : ${reason}`);
+    }
+    res.status(200).json({ message: 'Post signalé.', reportCount: post.reportCount });
+  } catch (err) {
+    res.status(500).json({ message: 'Erreur lors du signalement du post.' });
+  }
+}

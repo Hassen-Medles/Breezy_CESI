@@ -1,6 +1,15 @@
 import React, { useEffect, useState, forwardRef, useImperativeHandle } from "react";
 import CommentForm from "./CommentForm";
 
+const REPORT_REASONS = [
+  "Spam ou publicité",
+  "Discours haineux ou harcèlement",
+  "Nudité ou contenu sexuel",
+  "Violence ou menace",
+  "Fausses informations",
+  "Autre"
+];
+
 const FeedList = forwardRef((props, ref) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -11,6 +20,10 @@ const FeedList = forwardRef((props, ref) => {
   const [likeCounts, setLikeCounts] = useState({});
   const [likedPosts, setLikedPosts] = useState({});
   const [user, setUser] = useState(null);
+  const [reportModal, setReportModal] = useState({ open: false, postId: null });
+  const [selectedReason, setSelectedReason] = useState(REPORT_REASONS[0]);
+  const [reportLoading, setReportLoading] = useState(false);
+  const [reportMessage, setReportMessage] = useState("");
 
   // Récupère les likes pour chaque post
   const fetchLikes = async (posts) => {
@@ -122,6 +135,42 @@ const FeedList = forwardRef((props, ref) => {
     }
   };
 
+  // Fonction pour ouvrir la modale de signalement
+  const openReportModal = (postId) => {
+    setReportModal({ open: true, postId });
+    setSelectedReason(REPORT_REASONS[0]);
+    setReportMessage("");
+  };
+  // Fonction pour fermer la modale
+  const closeReportModal = () => {
+    setReportModal({ open: false, postId: null });
+    setReportMessage("");
+  };
+  // Fonction pour signaler un post avec motif
+  const handleReport = async () => {
+    if (!reportModal.postId) return;
+    setReportLoading(true);
+    try {
+      const res = await fetch(`/api/posts/${reportModal.postId}/report`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ reason: selectedReason })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setReportMessage("Post signalé ! Merci pour votre retour.");
+        setTimeout(() => closeReportModal(), 1200);
+      } else {
+        setReportMessage(data.message || "Erreur lors du signalement.");
+      }
+    } catch (err) {
+      setReportMessage("Erreur lors du signalement.");
+    } finally {
+      setReportLoading(false);
+    }
+  };
+
   useEffect(() => {
     fetchPosts();
   }, []);
@@ -204,6 +253,15 @@ const FeedList = forwardRef((props, ref) => {
                   💬
                 </button>
                 <span className="ml-1">{commentCounts[post._id] ?? 0}</span>
+                {/* Bouton signalement */}
+                <button
+                  className="ml-auto text-red-400 hover:text-red-600"
+                  title="Signaler ce post"
+                  style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }}
+                  onClick={() => openReportModal(post._id)}
+                >
+                  🚩
+                </button>
               </div>
               {openCommentPostId === post._id && (
                 <div className="mt-2">
@@ -222,6 +280,66 @@ const FeedList = forwardRef((props, ref) => {
           ))}
         </>
       )}
+      {/* Modale de signalement améliorée */}
+      {reportModal.open && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-20 transition-opacity duration-200 animate-fadein">
+          <div className="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-sm relative border border-gray-200 animate-fadein-card">
+            <button
+              className="absolute top-3 right-3 text-gray-400 hover:text-gray-700 text-2xl focus:outline-none"
+              onClick={closeReportModal}
+              disabled={reportLoading}
+              aria-label="Fermer"
+              style={{ background: 'none', border: 'none' }}
+            >
+              <svg width="24" height="24" fill="none" viewBox="0 0 24 24"><path stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" d="M6 6l12 12M6 18L18 6"/></svg>
+            </button>
+            <h3 className="font-bold text-lg mb-3 text-gray-800 text-center">Signaler ce post</h3>
+            <div className="mb-4">
+              <label className="block text-gray-700 mb-1 text-sm">Motif :</label>
+              <select
+                className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-red-200 focus:outline-none text-gray-700 bg-gray-50"
+                value={selectedReason}
+                onChange={e => setSelectedReason(e.target.value)}
+                disabled={reportLoading}
+              >
+                {REPORT_REASONS.map(reason => (
+                  <option key={reason} value={reason}>{reason}</option>
+                ))}
+              </select>
+            </div>
+            <div className="flex gap-2 mt-2">
+              <button
+                className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold py-2 rounded-lg border border-gray-200 transition-colors"
+                onClick={closeReportModal}
+                disabled={reportLoading}
+              >
+                Annuler
+              </button>
+              <button
+                className="flex-1 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 rounded-lg transition-colors disabled:opacity-60"
+                onClick={handleReport}
+                disabled={reportLoading}
+              >
+                {reportLoading ? "Signalement..." : "Signaler"}
+              </button>
+            </div>
+            {reportMessage && <div className="mt-3 text-center text-sm text-green-600 animate-fadein">{reportMessage}</div>}
+          </div>
+        </div>
+      )}
+      {/* Ajout des animations CSS */}
+      <style jsx global>{`
+        @keyframes fadein {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        .animate-fadein { animation: fadein 0.2s; }
+        @keyframes fadein-card {
+          from { opacity: 0; transform: translateY(20px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .animate-fadein-card { animation: fadein-card 0.25s; }
+      `}</style>
     </div>
   );
 });
