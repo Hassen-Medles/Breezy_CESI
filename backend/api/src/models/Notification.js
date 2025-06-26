@@ -19,6 +19,14 @@ const notificationSchema = new mongoose.Schema({
         type: Date,
         default: Date.now,
     },
+    postId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Post',
+    },
+    liker: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+    },
 });
 
 export default mongoose.model('Notification', notificationSchema);
