@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { FaHeart, FaRegComment } from "react-icons/fa";
 
 const mockPosts = [
   {
@@ -16,7 +17,6 @@ export default function Feed() {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!content.trim()) return;
-    // Ici tu feras un appel API pour publier le post
     setPosts([
       {
         id: Date.now(),
@@ -72,33 +72,44 @@ export default function Feed() {
       </form>
 
       {/* Posts */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto px-2">
         {posts.map(post => (
-          <div key={post.id} className="bg-white m-2 p-3 rounded shadow flex flex-col gap-1">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-full bg-gray-300" />
-              <span className="font-semibold">{post.author}</span>
+          <div key={post.id} className="bg-white rounded-lg shadow p-4 mb-4">
+            <div className="flex items-center mb-2">
+              <div className="w-10 h-10 rounded-full bg-gray-200 mr-3" />
+              <div>
+                <div className="font-semibold">{post.author}</div>
+                <div className="text-xs text-gray-400">{post.createdAt}</div>
+              </div>
             </div>
-            <div className="ml-10">{post.content}</div>
-            <div className="flex items-center text-xs text-gray-400 ml-10">
-              {post.createdAt}
-            </div>
-            <div className="flex items-center gap-4 ml-10 mt-1">
-              <button className="text-xl">+</button>
-              <button className="text-red-500 text-xl">♥</button>
-              <button className="text-gray-500 text-xl">💬</button>
+            <div className="mb-2 text-gray-800">{post.content}</div>
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center space-x-4">
+                <button className="text-red-500 flex items-center">
+                  <FaHeart className="mr-1" />
+                  <span>0</span>
+                </button>
+                <button className="text-gray-500 flex items-center">
+                  <FaRegComment className="mr-1" />
+                  <span>0</span>
+                </button>
+              </div>
             </div>
           </div>
         ))}
       </div>
-
-      {/* Bottom Navigation */}
-      <nav className="bg-white border-t flex justify-around items-center p-2 fixed bottom-0 left-0 right-0">
-        <button className="text-2xl">🏠</button>
-        <button className="text-2xl">🔍</button>
-        <button className="text-2xl">🔔</button>
-        <button className="text-2xl">👤</button>
-      </nav>
+      <style jsx global>{`
+        ::selection {
+          background: #38bdf8; /* sky-400 */
+          color: #fff;
+        }
+        input:focus, textarea:focus, select:focus, button:focus {
+          outline: 2px solid #38bdf8 !important; /* sky-400 */
+          outline-offset: 2px;
+          box-shadow: 0 0 0 2px #38bdf833;
+          border-color: #38bdf8 !important;
+        }
+      `}</style>
     </div>
   );
 }

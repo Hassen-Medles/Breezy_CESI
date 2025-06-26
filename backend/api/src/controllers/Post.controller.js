@@ -1,6 +1,7 @@
 import Post from '../models/Post.js';
 import Like from '../models/Like.js';
 import Follow from "../models/Follow.js";
+import Notification from '../models/Notification.js';
 
 export async function getFollowedPosts(req, res) {
   try {
@@ -100,6 +101,8 @@ export async function deletePost(req, res) {
     if (!post) {
       return res.status(404).json({ message: 'Post non trouvé.' });
     }
+    // Supprimer les notifications liées à ce post (like, comment, etc.)
+    await (await import('../models/Notification.js')).default.deleteMany({ postId });
     res.status(200).json({ message: 'Post supprimé avec succès.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors de la suppression du post.' });
@@ -136,6 +139,20 @@ export async function likePost(req, res) {
       return res.status(400).json({ message: 'Déjà liké.' });
     }
     await Like.create({ user: userId, post: postId });
+    // Récupérer le post pour obtenir l'auteur
+    const post = await Post.findById(postId);
+    // Récupérer l'utilisateur qui like
+    const liker = await (await import('../models/User.js')).default.findById(userId);
+    if (post && String(post.author) !== String(userId) && liker) {
+      // Créer une notification pour l'auteur du post avec le nom du liker
+      await Notification.create({
+        type: 'like',
+        user: post.author,
+        postId: post._id,
+        liker: liker._id,
+        message: `${liker.username || 'Un utilisateur'} a liké votre post.`
+      });
+    }
     res.status(201).json({ message: 'Post liké.' });
   } catch (err) {
     res.status(500).json({ message: 'Erreur lors du like.' });

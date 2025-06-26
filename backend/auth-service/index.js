@@ -11,8 +11,20 @@ import cookieParser from "cookie-parser";
 dotenv.config();
 
 const app = express();
+app.set('trust proxy', 1); // Important pour cookies derrière nginx/proxy
 app.use(cors({
-  origin: ["http://localhost:8080", "http://localhost:3000"],
+  origin: (origin, callback) => {
+    // Autorise localhost:8080, localhost:3000, et tout sous-réseau 10.116.128.*
+    if (!origin) return callback(null, true);
+    if (
+      origin.startsWith('http://localhost:8080') ||
+      origin.startsWith('http://localhost:3000') ||
+      /^http:\/\/10\.116\.128\.[0-9]+(:[0-9]+)?$/.test(origin)
+    ) {
+      return callback(null, true);
+    }
+    callback(new Error('Not allowed by CORS'));
+  },
   credentials: true
 }));
 app.use(express.json());

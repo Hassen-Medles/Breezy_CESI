@@ -66,7 +66,7 @@ export default function CommentForm({
             >
               <input
                 type="text"
-                className="flex-1 border rounded-full px-3 py-1 text-sm"
+                className="flex-1 border border-gray-300 focus:border-sky-400 focus:ring-sky-400 rounded-full px-3 py-1 text-sm outline-none transition-colors"
                 placeholder="Votre réponse..."
                 value={replyInputs[comment._id] || ""}
                 onChange={e =>
@@ -79,7 +79,7 @@ export default function CommentForm({
               />
               <button
                 type="submit"
-                className="bg-black text-white rounded-full p-2 hover:bg-gray-800"
+                className="bg-sky-500 text-white rounded-full p-2 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-colors"
                 title="Envoyer"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>
@@ -107,7 +107,7 @@ export default function CommentForm({
           <div className="w-6 h-6 rounded-full bg-gray-200" />
           <input
             type="text"
-            className="flex-1 border rounded-full px-3 py-1 text-sm"
+            className="flex-1 border border-gray-300 focus:border-sky-400 focus:ring-sky-400 rounded-full px-3 py-1 text-sm outline-none transition-colors"
             placeholder="Votre commentaire..."
             value={rootContent}
             onChange={e => setRootContent(e.target.value)}
@@ -115,7 +115,7 @@ export default function CommentForm({
           />
           <button
             type="submit"
-            className="bg-black text-white rounded-full p-2 hover:bg-gray-800"
+            className="bg-sky-500 text-white rounded-full p-2 hover:bg-sky-400 focus:outline-none focus:ring-2 focus:ring-sky-400 transition-colors"
             title="Envoyer"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 12h14M12 5l7 7-7 7" /></svg>

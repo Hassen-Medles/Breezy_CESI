@@ -30,6 +30,10 @@ export default function Conversation() {
       }
     };
     fetchConversation();
+
+    // Ajout du polling toutes les 2 secondes
+    const interval = setInterval(fetchConversation, 2000);
+    return () => clearInterval(interval);
   }, [id]);
 
   // Scroll to bottom when messages change
