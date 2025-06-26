@@ -25,13 +25,11 @@ export default function Accueil() {
     })
       .then(async res => {
         if (!res.ok) {
-          // Essaye de lire le JSON, sinon ignore l'erreur de parsing
           try { await res.json(); } catch {}
           router.push("/");
           setLoading(false);
           return null;
         }
-        // Vérifie que la réponse est bien du JSON
         const contentType = res.headers.get("content-type");
         if (!contentType || !contentType.includes("application/json")) {
           router.push("/");
@@ -57,8 +55,10 @@ export default function Accueil() {
     <>
       <Navbar title="POUR VOUS" />
       <div className="h-20" />
-      <PostForm onPostCreated={handlePostCreated} />
-      <FeedList ref={feedListRef} />  
+      <div className="pb-24">
+        <PostForm onPostCreated={handlePostCreated} />
+        <FeedList ref={feedListRef} />
+      </div>
     </>
   );
 }

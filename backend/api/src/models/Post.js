@@ -18,6 +18,10 @@ const postSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    reportCount: {
+        type: Number,
+        default: 0
+    }
 });
 const Post = mongoose.model('Post', postSchema);
 export default Post;

@@ -63,7 +63,7 @@ export default function ParametresPage() {
       {/* Espace pour la navbar sticky */}
       <div className="h-20" />
       <div className="w-full flex flex-col gap-8 mt-2 px-2 sm:px-4 items-center">
-        <div className="w-full max-w-sm flex flex-col gap-8">
+        <div className="w-full max-w-sm flex flex-col gap-8 pb-24">
           {/* Bouton retour */}
           <button
             onClick={() => router.push('/profil')}
