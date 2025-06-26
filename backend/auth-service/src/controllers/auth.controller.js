@@ -60,8 +60,8 @@ export const register = async (req, res) => {
       secure: false,
       sameSite: 'lax',
       path: '/',
-      maxAge: 24 * 60 * 60 * 1000,
-      //domain: 'localhost'
+      maxAge: 24 * 60 * 60 * 1000
+      // PAS de domain ici !
     });
 
     // Log avant l'envoi du mail
@@ -109,8 +109,8 @@ export const verify = async (req, res) => {
     secure: false,
     sameSite: 'lax',
     path: '/',
-    maxAge: 24 * 60 * 60 * 1000,
-    domain: 'localhost'
+    maxAge: 24 * 60 * 60 * 1000
+    // PAS de domain ici !
   });
   res.status(201).json({ message: "Compte vérifié !" });
 };
@@ -141,8 +141,8 @@ export const login = async (req, res) => {
       secure: false,
       sameSite: 'lax',
       path: '/',
-      maxAge: 24 * 60 * 60 * 1000,
-      domain: 'localhost'
+      maxAge: 24 * 60 * 60 * 1000
+      // PAS de domain ici !
     });
   res.json({ message: "Connexion réussie !" });
   } catch (err) {
