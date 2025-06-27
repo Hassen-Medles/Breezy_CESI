@@ -1,8 +1,10 @@
 import React, { useState, useRef } from "react";
-import { FaPhotoVideo, FaVideo } from "react-icons/fa";
+import { FaPhotoVideo, FaVideo, FaTags, FaTimes } from "react-icons/fa";
 
 export default function PostForm({ onPostCreated }) {
   const [content, setContent] = useState("");
+  const [tags, setTags] = useState([]);
+  const [tagInput, setTagInput] = useState("");
   const [image, setImage] = useState(null);
   const [video, setVideo] = useState(null);
   const [preview, setPreview] = useState(null);
@@ -11,6 +13,7 @@ export default function PostForm({ onPostCreated }) {
   const [loading, setLoading] = useState(false);
   const imageInputRef = useRef();
   const videoInputRef = useRef();
+  const tagInputRef = useRef();
 
   const handleImageChange = (e) => {
     const file = e.target.files[0];
@@ -32,6 +35,28 @@ export default function PostForm({ onPostCreated }) {
     }
   };
 
+  const handleTagInput = (e) => {
+    setTagInput(e.target.value);
+  };
+
+  const handleTagKeyDown = (e) => {
+    if ((e.key === 'Enter' || e.key === ' ' || e.key === ',') && tagInput.trim()) {
+      e.preventDefault();
+      addTag(tagInput.trim());
+    }
+  };
+
+  const addTag = (tag) => {
+    if (tag && !tags.includes(tag)) {
+      setTags([...tags, tag]);
+    }
+    setTagInput("");
+  };
+
+  const removeTag = (tag) => {
+    setTags(tags.filter(t => t !== tag));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
@@ -39,6 +64,7 @@ export default function PostForm({ onPostCreated }) {
     try {
       const formData = new FormData();
       formData.append("content", content);
+      tags.forEach(tag => formData.append("tags", tag));
       if (image) formData.append("image", image);
       if (video) formData.append("video", video);
       const res = await fetch("/api/posts", {
@@ -51,6 +77,8 @@ export default function PostForm({ onPostCreated }) {
         throw new Error(data.message || "Erreur lors de la création du post");
       }
       setContent("");
+      setTags([]);
+      setTagInput("");
       setImage(null);
       setVideo(null);
       setPreview(null);
@@ -78,6 +106,28 @@ export default function PostForm({ onPostCreated }) {
         maxLength={280}
         required
       />
+      <div className="mb-2">
+        <div className="flex items-center flex-wrap gap-2 mb-1">
+          {tags.map((tag, idx) => (
+            <span key={idx} className="bg-sky-100 text-sky-700 px-2 py-1 rounded text-xs font-semibold flex items-center">
+              #{tag}
+              <button type="button" className="ml-1 text-sky-500 hover:text-red-500" onClick={() => removeTag(tag)} title="Supprimer ce tag">
+                <FaTimes size={10} />
+              </button>
+            </span>
+          ))}
+          <input
+            type="text"
+            ref={tagInputRef}
+            className="border rounded p-1 text-xs"
+            placeholder={tags.length === 0 ? "Ajouter un tag..." : "#tag"}
+            value={tagInput}
+            onChange={handleTagInput}
+            onKeyDown={handleTagKeyDown}
+            style={{ minWidth: 80, maxWidth: 120 }}
+          />
+        </div>
+      </div>
       <div className="flex gap-4 mb-2">
         <button
           type="button"

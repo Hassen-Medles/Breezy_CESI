@@ -260,6 +260,13 @@ const FeedList = forwardRef((props, ref) => {
                 </div>
               </div>
               <div className="mb-2 text-gray-800">{post.content}</div>
+              {post.tags && post.tags.length > 0 && (
+                <div className="mb-2 flex flex-wrap gap-2">
+                  {post.tags.map((tag, idx) => (
+                    <span key={idx} className="bg-sky-100 text-sky-700 px-2 py-1 rounded text-xs font-semibold">#{tag}</span>
+                  ))}
+                </div>
+              )}
               {post.image && (
                 <div className="mb-2">
                   <img

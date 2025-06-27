@@ -27,6 +27,14 @@ export async function createPost(req, res) {
     const content = req.body.content || (req.body && req.body.get && req.body.get('content'));
     let image = null;
     let video = null;
+    let tags = [];
+    if (req.body.tags) {
+      if (Array.isArray(req.body.tags)) {
+        tags = req.body.tags;
+      } else if (typeof req.body.tags === 'string') {
+        tags = req.body.tags.split(',').map(t => t.trim()).filter(Boolean);
+      }
+    }
     if (req.files) {
       if (req.files.image && req.files.image[0]) {
         image = `/uploads/${req.files.image[0].filename}`;
@@ -49,7 +57,8 @@ export async function createPost(req, res) {
       content,
       author: req.user.userId || req.user.id,
       image,
-      video
+      video,
+      tags
     });
     await post.save();
     res.status(201).json(post);
