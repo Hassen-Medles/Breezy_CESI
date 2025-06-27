@@ -23,10 +23,24 @@ export async function getFollowedPosts(req, res) {
 
 export async function createPost(req, res) {
   try {
-    const { content } = req.body;
+    // Pour FormData, req.body est un objet vide, il faut parser manuellement
+    const content = req.body.content || (req.body && req.body.get && req.body.get('content'));
     let image = null;
-    if (req.file) {
-      image = `/uploads/${req.file.filename}`;
+    let video = null;
+    if (req.files) {
+      if (req.files.image && req.files.image[0]) {
+        image = `/uploads/${req.files.image[0].filename}`;
+      }
+      if (req.files.video && req.files.video[0]) {
+        video = `/uploads/${req.files.video[0].filename}`;
+      }
+    } else if (req.file) {
+      // Pour compatibilité avec un seul fichier (image OU vidéo)
+      if (req.file.mimetype.startsWith('image/')) {
+        image = `/uploads/${req.file.filename}`;
+      } else if (req.file.mimetype.startsWith('video/')) {
+        video = `/uploads/${req.file.filename}`;
+      }
     }
     if (!content || content.length > 280) {
       return res.status(400).json({ message: 'Le message doit faire entre 1 et 280 caractères.' });
@@ -34,7 +48,8 @@ export async function createPost(req, res) {
     const post = new Post({
       content,
       author: req.user.userId || req.user.id,
-      image
+      image,
+      video
     });
     await post.save();
     res.status(201).json(post);

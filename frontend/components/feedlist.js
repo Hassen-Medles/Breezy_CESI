@@ -269,6 +269,17 @@ const FeedList = forwardRef((props, ref) => {
                   />
                 </div>
               )}
+              {post.video && (
+                <div className="mb-2">
+                  <video
+                    src={post.video.startsWith('http') ? post.video : `http://localhost:5001${post.video}`}
+                    controls
+                    className="max-h-64 rounded-lg border border-gray-200 object-contain mx-auto"
+                  >
+                    Votre navigateur ne supporte pas la lecture vidéo.
+                  </video>
+                </div>
+              )}
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center space-x-4">
                   <button

@@ -6,7 +6,10 @@ import uploadImage from '../middlewares/uploadImage.js';
 const router = express.Router();
 
 // Création d'un post (protégée)
-router.post('/posts', auth, uploadImage.single('image'), postController.createPost);
+router.post('/posts', auth, uploadImage.fields([
+  { name: 'image', maxCount: 1 },
+  { name: 'video', maxCount: 1 }
+]), postController.createPost);
 // Récupérer tous les posts (public)
 router.get('/posts', postController.getAllPosts);
 // Récupérer les posts d'un utilisateur (protégée)

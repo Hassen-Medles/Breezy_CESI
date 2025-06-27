@@ -14,6 +14,10 @@ const postSchema = new mongoose.Schema({
         type: String, // Chemin du fichier image
         default: null
     },
+    video: {
+        type: String, // Chemin du fichier vidéo
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
