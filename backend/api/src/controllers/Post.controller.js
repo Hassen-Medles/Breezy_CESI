@@ -24,12 +24,17 @@ export async function getFollowedPosts(req, res) {
 export async function createPost(req, res) {
   try {
     const { content } = req.body;
+    let image = null;
+    if (req.file) {
+      image = `/uploads/${req.file.filename}`;
+    }
     if (!content || content.length > 280) {
       return res.status(400).json({ message: 'Le message doit faire entre 1 et 280 caractères.' });
     }
     const post = new Post({
       content,
-      author: req.user.userId || req.user.id
+      author: req.user.userId || req.user.id,
+      image
     });
     await post.save();
     res.status(201).json(post);

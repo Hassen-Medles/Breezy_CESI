@@ -1,11 +1,12 @@
 import express from 'express';
 import * as postController from '../controllers/Post.controller.js';
 import auth from '../middlewares/auth.js';
+import uploadImage from '../middlewares/uploadImage.js';
 
 const router = express.Router();
 
 // Création d'un post (protégée)
-router.post('/posts', auth, postController.createPost);
+router.post('/posts', auth, uploadImage.single('image'), postController.createPost);
 // Récupérer tous les posts (public)
 router.get('/posts', postController.getAllPosts);
 // Récupérer les posts d'un utilisateur (protégée)

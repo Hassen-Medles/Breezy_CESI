@@ -260,6 +260,15 @@ const FeedList = forwardRef((props, ref) => {
                 </div>
               </div>
               <div className="mb-2 text-gray-800">{post.content}</div>
+              {post.image && (
+                <div className="mb-2">
+                  <img
+                    src={post.image.startsWith('http') ? post.image : `http://localhost:5001${post.image}`}
+                    alt="Post visuel"
+                    className="max-h-64 rounded-lg border border-gray-200 object-contain mx-auto"
+                  />
+                </div>
+              )}
               <div className="flex items-center justify-between mt-2">
                 <div className="flex items-center space-x-4">
                   <button

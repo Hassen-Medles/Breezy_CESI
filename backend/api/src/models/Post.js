@@ -10,6 +10,10 @@ const postSchema = new mongoose.Schema({
         ref: 'User',
         required: true
     },
+    image: {
+        type: String, // Chemin du fichier image
+        default: null
+    },
     createdAt: {
         type: Date,
         default: Date.now
